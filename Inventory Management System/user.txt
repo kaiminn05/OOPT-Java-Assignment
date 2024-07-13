@@ -1,1 +1,4 @@
 kaiminn05,kaiminn230305,20,Admin
+kaiminn2303,kaiminn230305,19,Inventory Manager
+kaiminn23,kaiminn230305,15,Stock Clerk
+kaiminn123,kaiminn12345,19,Supplier Manager
