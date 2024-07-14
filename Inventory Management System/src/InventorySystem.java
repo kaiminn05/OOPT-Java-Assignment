@@ -20,6 +20,7 @@ public class InventorySystem {
         System.out.println("1. Login");
         System.out.println("2. Register");
         System.out.println("3. Exit");
+        System.out.print("Enter your choice > ");
         int choice = scan.nextInt();
         scan.nextLine();
         System.out.println();
@@ -46,7 +47,7 @@ public class InventorySystem {
             System.out.println("3. Supplier Management");
             System.out.println("4. Check Expiry and Stock Alerts");
             System.out.println("5. Logout");
-            System.out.print("Enter your choice: ");
+            System.out.print("Enter your choice > ");
             int choice = scan.nextInt();
             scan.nextLine(); 
 
@@ -55,6 +56,7 @@ public class InventorySystem {
                     if (loggedInUser.getRole().equals("Admin") || loggedInUser.getRole().equals("Inventory Manager")) {
                         System.out.println("Accessing Inventory Management...");
                         sleepUtil.sleep(2000);
+                        InventoryManagement.showInvMenu();
                     } else {
                         System.out.println(ColorUtil.RED_BOLD + "Access denied. You do not have permission to access Inventory Management." + ColorUtil.RESET);
                         sleepUtil.sleep(2000);
@@ -118,7 +120,9 @@ public class InventorySystem {
             System.out.print("Password: ");
             String password = scan.nextLine();
             if (currentUser.getPassword().equals(password)) {
-                System.out.println("Login Successful!");
+                ClearScreenUtil.clearScreen();
+                System.out.println(ColorUtil.GREEN_BOLD + "Login Successful!" + ColorUtil.RESET);
+                sleepUtil.sleep(1000);
                 System.out.println("Logged in as " + ColorUtil.GREEN + username + ColorUtil.RESET);
                 loggedInUser = currentUser; // set the logged in user
                 sleepUtil.sleep(2000);
@@ -170,7 +174,7 @@ public class InventorySystem {
             System.out.println("2. Inventory Manager");
             System.out.println("3. Stock Clerk");
             System.out.println("4. Supplier Manager");
-            System.out.print("Your choice -> ");
+            System.out.print("Your choice > ");
             int choice = scan.nextInt();
             scan.nextLine();
             String role = "";
