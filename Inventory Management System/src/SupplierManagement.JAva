@@ -8,10 +8,8 @@ import java.util.Scanner;
 
 public class SupplierManagement {
     private static Scanner scan = new Scanner(System.in);
-    private static List<Item> items = new ArrayList<>();
 
-    public static void showSupMenu(String[] args) {
-        loadItemsData();
+    public static void showSupMenu() {
             while (true) {
                 clearScreen();
                 System.out.println("Supplier Management");
