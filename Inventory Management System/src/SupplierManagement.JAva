@@ -1,4 +1,3 @@
-import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
@@ -59,23 +58,23 @@ public class SupplierManagement {
             }
         }
 
+        //The Supplier Object
         private static void addSupplier() {
-            System.out.println("Add Supplier...");
-            System.out.println("Enter supplier name: ");
+            System.out.println(ColorUtil.GREEN_BOLD + "Add Supplier..." + ColorUtil.RESET);
+            System.out.print("Enter supplier name: ");
             String name = scan.nextLine();
-            System.out.println("Enter supplier address: ");
+            System.out.print("Enter supplier address: ");
             String address = scan.nextLine();
-            System.out.println("enter supplier contact number: ");
+            System.out.print("Enter supplier contact number: ");
             String contactNum = scan.nextLine();
-
+    
             Supplier supplier = new Supplier(name, address, contactNum);
-
-            try(BufferedWriter writer = new BufferedWriter(new FileWriter("suppliers.txt", true))){
-                writer.write(supplier.toString());
-                writer.newLine();
-                System.out.println("Supplier added successfully!");
-            }catch(IOException e){
-                System.out.println("An error occurred while writing to the file.");
+    
+            try (FileWriter writer = new FileWriter("suppliers.txt", true)) {
+                writer.write(supplier.toString() + System.lineSeparator());
+                System.out.println(ColorUtil.GREEN_BOLD + "Supplier added successfully!" + ColorUtil.RESET);
+            } catch (IOException e) {
+                System.out.println(ColorUtil.RED_BOLD + "An error occurred while writing to the file." + ColorUtil.RESET);
                 e.printStackTrace();
             }
         }
