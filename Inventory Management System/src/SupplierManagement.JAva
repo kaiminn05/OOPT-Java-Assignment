@@ -1,9 +1,6 @@
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class SupplierManagement {
@@ -44,8 +41,43 @@ public class SupplierManagement {
                 }
             }
         }
+
+        //Supplier Class
+        static class Supplier{
+            private String name;
+            private String address;
+            private String contactNum;
+
+            public Supplier(String name, String address, String contactNum){
+                this.name = name;
+                this.address = address;
+                this.contactNum = contactNum;
+            }
+
+            public String toString(){
+                return name + "," + address + "," + contactNum;
+            }
+        }
+
         private static void addSupplier() {
             System.out.println("Add Supplier...");
+            System.out.println("Enter supplier name: ");
+            String name = scan.nextLine();
+            System.out.println("Enter supplier address: ");
+            String address = scan.nextLine();
+            System.out.println("enter supplier contact number: ");
+            String contactNum = scan.nextLine();
+
+            Supplier supplier = new Supplier(name, address, contactNum);
+
+            try(BufferedWriter writer = new BufferedWriter(new FileWriter("suppliers.txt", true))){
+                writer.write(supplier.toString());
+                writer.newLine();
+                System.out.println("Supplier added successfully!");
+            }catch(IOException e){
+                System.out.println("An error occurred while writing to the file.");
+                e.printStackTrace();
+            }
         }
     
         private static void updateSupplierInformation() {
