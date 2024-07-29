@@ -8,10 +8,10 @@ import java.util.Scanner;
 
 public class InventoryManagement {
     private static Scanner scan = new Scanner(System.in);
-    private static List<Item> items = new ArrayList<>(); 
+    private static List<Item> items = new ArrayList<>();
 
     public static void showInvMenu() {
-        
+
         while (true) {
             loadItemsData();
             ClearScreenUtil.clearScreen();
@@ -31,7 +31,9 @@ public class InventoryManagement {
 
             switch (choice) {
                 case 1:
-                    viewInventory();
+                    ClearScreenUtil.clearScreen();
+                    System.out.println("CURRENT INVENTORY ITEMS");
+                    displayInventory();
                     System.out.print("Press any key to continue....");
                     scan.nextLine();
                     break;
@@ -40,7 +42,7 @@ public class InventoryManagement {
                     sleepUtil.sleep(2000);
                     break;
                 case 3:
-                    System.out.println("Update Inventory Items...");
+                    updateInventory();
                     sleepUtil.sleep(2000);
                     break;
                 case 4:
@@ -102,9 +104,96 @@ public class InventoryManagement {
         }
     }
 
+    private static void displayInventory() {
+        System.out.println(
+                "========================================================================================================");
+        System.out.printf("%-10s %-20s %-20s %-10s %-10s %-20s %-10s%n",
+                "ID", "Name", "Description", "Price", "Unit", "Supplier", "Quantity");
+        System.out.println(
+                "========================================================================================================");
+
+        for (Item item : items) {
+            System.out.printf("%-10s %-20s %-20s %-10.2f %-10s %-20s %-10d%n",
+                    item.getId(), item.getName(), item.getDesc(), item.getPrice(),
+                    item.getUnit(), item.getSupplier(), item.getQty());
+        }
+        System.out.println(
+                "========================================================================================================");
+    }
+
+    private static void updateInventory() {
+        ClearScreenUtil.clearScreen();
+        System.out.println("UPDATE INVENTORY ITEMS");
+        System.out.println("=======================");
+        displayInventory();
+        System.out.print("Enter item ID to choose > ");
+        String itemId = scan.nextLine();
+
+        Item itemToUpdate = null;
+        for (Item item : items) {
+            if (item.getId().equalsIgnoreCase(itemId)) {
+                itemToUpdate = item;
+                break;
+            }
+        }
+
+        if (itemToUpdate == null) {
+            System.out.println("Item ID not found.");
+            return;
+        }
+
+        System.out.println("Selected Item: " + itemToUpdate.getName());
+        System.out.println("1. Update Name");
+        System.out.println("2. Update Description");
+        System.out.println("3. Update Price");
+        System.out.println("4. Update Unit");
+        System.out.println("5. Update Supplier");
+        System.out.println("6. Update Quantity");
+        System.out.print("Enter field number to update > ");
+        int updateChoice = scan.nextInt();
+        scan.nextLine(); 
+
+        switch (updateChoice) {
+            case 1:
+                System.out.print("Enter new name: ");
+                itemToUpdate.setName(scan.nextLine());
+                break;
+            case 2:
+                System.out.print("Enter new description: ");
+                itemToUpdate.setDesc(scan.nextLine());
+                break;
+            case 3:
+                System.out.print("Enter new price: ");
+                itemToUpdate.setPrice(scan.nextDouble());
+                scan.nextLine(); // Consume newline
+                break;
+            case 4:
+                System.out.print("Enter new unit: ");
+                itemToUpdate.setUnit(scan.nextLine());
+                break;
+            case 5:
+                System.out.print("Enter new supplier: ");
+                itemToUpdate.setSupplier(scan.nextLine());
+                break;
+            case 6:
+                System.out.print("Enter new quantity: ");
+                itemToUpdate.setQty(scan.nextInt());
+                scan.nextLine(); 
+                break;
+            default:
+                System.out.println("Invalid option.");
+                return;
+        }
+
+        saveUpdatedData(); //save all data after update
+        System.out.println(ColorUtil.GREEN_BOLD + "Item updated successfully." + ColorUtil.RESET);
+    }
+
     private static boolean saveItemData(Item item) {
-        try (FileWriter writer = new FileWriter("C:\\Users\\Acer\\OneDrive\\Desktop\\OOPT Java Assignment\\Inventory Management System\\resources\\inventory.txt", true)) { // write in append mode so that exist items
-                                                                          // wont replace new item
+        try (FileWriter writer = new FileWriter(
+                "C:\\Users\\Acer\\OneDrive\\Desktop\\OOPT Java Assignment\\Inventory Management System\\resources\\inventory.txt",
+                true)) { // write in append mode so that exist items
+            // wont replace new item
             writer.write(item.getId() + "," + item.getName() + "," + item.getDesc() + "," + item.getPrice() + ","
                     + item.getUnit() + "," + item.getSupplier() + "," + item.getQty() + "\n");
             return true;
@@ -114,21 +203,34 @@ public class InventoryManagement {
             return false;
         }
     }
-
+    private static boolean saveUpdatedData() {
+        try (FileWriter writer = new FileWriter(
+                "C:\\Users\\Acer\\OneDrive\\Desktop\\OOPT Java Assignment\\Inventory Management System\\resources\\inventory.txt")) {
+            for (Item item : items) {
+                writer.write(item.getId() + "," + item.getName() + "," + item.getDesc() + "," + item.getPrice() + ","
+                        + item.getUnit() + "," + item.getSupplier() + "," + item.getQty() + "\n");
+            }
+            return true;
+        } catch (IOException e) {
+            System.out.println("Error saving item data.");
+            e.printStackTrace();
+            return false;
+        }
+    }
     private static void loadItemsData() {
         items.clear(); // clear existing list
-        File file = new File("C:\\Users\\Acer\\OneDrive\\Desktop\\OOPT Java Assignment\\Inventory Management System\\resources\\inventory.txt");
-        
+        File file = new File(
+                "C:\\Users\\Acer\\OneDrive\\Desktop\\OOPT Java Assignment\\Inventory Management System\\resources\\inventory.txt");
+
         if (!file.exists()) {
             System.out.println("The file inventory.txt does not exist.");
             return;
         }
-        
+
         try (Scanner fileScanner = new Scanner(file)) {
             while (fileScanner.hasNextLine()) {
                 String data = fileScanner.nextLine();
-                
-                
+
                 String[] itemDetails = data.split(",");
                 if (itemDetails.length == 7) {
                     String id = itemDetails[0];
@@ -138,10 +240,10 @@ public class InventoryManagement {
                     String unit = itemDetails[4];
                     String supplier = itemDetails[5];
                     int quantity = Integer.parseInt(itemDetails[6]);
-                    
+
                     Item item = new Item(id, name, desc, price, unit, supplier, quantity);
                     items.add(item);
-                   
+
                 }
             }
         } catch (FileNotFoundException e) {
@@ -151,24 +253,6 @@ public class InventoryManagement {
             System.out.println("An unexpected error occurred.");
             e.printStackTrace();
         }
-    }
-    
-    
-
-    private static void viewInventory() {
-        ClearScreenUtil.clearScreen();
-        System.out.println("CURRENT INVENTORY ITEMS");
-        System.out.println("========================================================================================================");
-        System.out.printf("%-10s %-20s %-20s %-10s %-10s %-20s %-10s%n",
-                "ID", "Name", "Description", "Price", "Unit", "Supplier", "Quantity");
-        System.out.println("========================================================================================================");
-
-        for (Item item : items) {
-            System.out.printf("%-10s %-20s %-20s %-10.2f %-10s %-20s %-10d%n",
-                    item.getId(), item.getName(), item.getDesc(), item.getPrice(),
-                    item.getUnit(), item.getSupplier(), item.getQty());
-        }
-        System.out.println("========================================================================================================");
     }
 
     private static class Item {
@@ -180,7 +264,6 @@ public class InventoryManagement {
         private String supplier;
         private int quantity;
 
-        
         public Item(String id, String name, String desc, double price, String unit, String supplier, int quantity) {
             this.id = id;
             this.name = name;
@@ -191,7 +274,6 @@ public class InventoryManagement {
             this.quantity = quantity;
         }
 
-        
         public String getId() {
             return id;
         }
@@ -218,6 +300,30 @@ public class InventoryManagement {
 
         public int getQty() {
             return quantity;
+        }  
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public void setDesc(String desc) {
+            this.desc = desc;
+        }
+
+        public void setPrice(double price) {
+            this.price = price;
+        }
+
+        public void setUnit(String unit) {
+            this.unit = unit;
+        }
+
+        public void setSupplier(String supplier) {
+            this.supplier = supplier;
+        }
+
+        public void setQty(int quantity) {
+            this.quantity = quantity;
         }
     }
 }

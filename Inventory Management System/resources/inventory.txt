@@ -1,2 +1,2 @@
 A001,milk,milkjy,100.0,L,dairy,0
-A002,testing,testing,1000.0,L,dair,0
+A002,changed,testing,1000.0,L,dair,0
