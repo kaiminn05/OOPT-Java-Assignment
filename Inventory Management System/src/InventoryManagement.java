@@ -104,7 +104,7 @@ public class InventoryManagement {
         }
     }
 
-    private static void displayInventory() {
+    private static void displayInventory() { //display the inventory list(can be used for other part)
         System.out.println(
                 "========================================================================================================");
         System.out.printf("%-10s %-20s %-20s %-10s %-10s %-20s %-10s%n",
@@ -121,7 +121,7 @@ public class InventoryManagement {
                 "========================================================================================================");
     }
 
-    private static void updateInventory() {
+    private static void updateInventory() { //update inventory function
         ClearScreenUtil.clearScreen();
         System.out.println("UPDATE INVENTORY ITEMS");
         System.out.println("=======================");
@@ -189,7 +189,7 @@ public class InventoryManagement {
         System.out.println(ColorUtil.GREEN_BOLD + "Item updated successfully." + ColorUtil.RESET);
     }
 
-    private static boolean saveItemData(Item item) {
+    private static boolean saveItemData(Item item) { //this if use for add items with append TRUE so that data wont replace previous data
         try (FileWriter writer = new FileWriter(
                 "C:\\Users\\Acer\\OneDrive\\Desktop\\OOPT Java Assignment\\Inventory Management System\\resources\\inventory.txt",
                 true)) { // write in append mode so that exist items
@@ -203,7 +203,7 @@ public class InventoryManagement {
             return false;
         }
     }
-    private static boolean saveUpdatedData() {
+    private static boolean saveUpdatedData() { //this is use for update items information without append TRUE
         try (FileWriter writer = new FileWriter(
                 "C:\\Users\\Acer\\OneDrive\\Desktop\\OOPT Java Assignment\\Inventory Management System\\resources\\inventory.txt")) {
             for (Item item : items) {
