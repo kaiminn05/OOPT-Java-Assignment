@@ -1,3 +1,0 @@
-A001,Milk,milkkkkk,10.5,L,Dairy Milk,0
-A002,Bread,Breadddddd,111.2,gram,Gardenia,0
-A003,Olive Oil,oil from China,19.9,ML,Oil Supplier China,0

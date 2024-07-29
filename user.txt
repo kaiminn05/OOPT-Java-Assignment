@@ -1,4 +1,0 @@
-kaiminn05,kaiminn230305,19,Inventory Manager
-kaiminn2303,kaiminn05,21,Stock Clerk
-km05,km123456,30,Admin
-weiquan,leewq0829,20,Stock Clerk

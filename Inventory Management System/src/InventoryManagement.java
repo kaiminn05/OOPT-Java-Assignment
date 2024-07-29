@@ -11,8 +11,9 @@ public class InventoryManagement {
     private static List<Item> items = new ArrayList<>(); 
 
     public static void showInvMenu() {
-        loadItemsData();
+        
         while (true) {
+            loadItemsData();
             ClearScreenUtil.clearScreen();
             System.out.println("Inventory Management");
             System.out.println("======================");
@@ -102,7 +103,7 @@ public class InventoryManagement {
     }
 
     private static boolean saveItemData(Item item) {
-        try (FileWriter writer = new FileWriter("inventory.txt", true)) { // write in append mode so that exist items
+        try (FileWriter writer = new FileWriter("C:\\Users\\Acer\\OneDrive\\Desktop\\OOPT Java Assignment\\Inventory Management System\\resources\\inventory.txt", true)) { // write in append mode so that exist items
                                                                           // wont replace new item
             writer.write(item.getId() + "," + item.getName() + "," + item.getDesc() + "," + item.getPrice() + ","
                     + item.getUnit() + "," + item.getSupplier() + "," + item.getQty() + "\n");
@@ -116,9 +117,18 @@ public class InventoryManagement {
 
     private static void loadItemsData() {
         items.clear(); // clear existing list
-        try (Scanner fileScanner = new Scanner(new File("inventory.txt"))) {
+        File file = new File("C:\\Users\\Acer\\OneDrive\\Desktop\\OOPT Java Assignment\\Inventory Management System\\resources\\inventory.txt");
+        
+        if (!file.exists()) {
+            System.out.println("The file inventory.txt does not exist.");
+            return;
+        }
+        
+        try (Scanner fileScanner = new Scanner(file)) {
             while (fileScanner.hasNextLine()) {
                 String data = fileScanner.nextLine();
+                System.out.println("Reading line: " + data); 
+                
                 String[] itemDetails = data.split(",");
                 if (itemDetails.length == 7) {
                     String id = itemDetails[0];
@@ -128,15 +138,26 @@ public class InventoryManagement {
                     String unit = itemDetails[4];
                     String supplier = itemDetails[5];
                     int quantity = Integer.parseInt(itemDetails[6]);
+                    
                     Item item = new Item(id, name, desc, price, unit, supplier, quantity);
                     items.add(item);
+                    System.out.println("Item added: " + item.getName()); // Debug statement
+                } else {
+                    System.out.println("Invalid item data: " + data);
                 }
             }
         } catch (FileNotFoundException e) {
             System.out.println("An error occurred while loading items data.");
             e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred.");
+            e.printStackTrace();
         }
+    
+        System.out.println("Total items loaded: " + items.size()); // Debug statement
     }
+    
+    
 
     private static void viewInventory() {
         ClearScreenUtil.clearScreen();
