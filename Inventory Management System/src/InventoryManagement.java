@@ -191,7 +191,7 @@ public class InventoryManagement {
 
     private static boolean saveItemData(Item item) { //this if use for add items with append TRUE so that data wont replace previous data
         try (FileWriter writer = new FileWriter(
-                "C:\\Users\\Acer\\OneDrive\\Desktop\\OOPT Java Assignment\\Inventory Management System\\resources\\inventory.txt",
+                "Inventory Management System\\resources\\inventory.txt",
                 true)) { // write in append mode so that exist items
             // wont replace new item
             writer.write(item.getId() + "," + item.getName() + "," + item.getDesc() + "," + item.getPrice() + ","
@@ -205,7 +205,7 @@ public class InventoryManagement {
     }
     private static boolean saveUpdatedData() { //this is use for update items information without append TRUE
         try (FileWriter writer = new FileWriter(
-                "C:\\Users\\Acer\\OneDrive\\Desktop\\OOPT Java Assignment\\Inventory Management System\\resources\\inventory.txt")) {
+                "Inventory Management System\\resources\\inventory.txt")) {
             for (Item item : items) {
                 writer.write(item.getId() + "," + item.getName() + "," + item.getDesc() + "," + item.getPrice() + ","
                         + item.getUnit() + "," + item.getSupplier() + "," + item.getQty() + "\n");
