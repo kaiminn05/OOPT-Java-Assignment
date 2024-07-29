@@ -127,7 +127,7 @@ public class InventoryManagement {
         try (Scanner fileScanner = new Scanner(file)) {
             while (fileScanner.hasNextLine()) {
                 String data = fileScanner.nextLine();
-                System.out.println("Reading line: " + data); 
+                
                 
                 String[] itemDetails = data.split(",");
                 if (itemDetails.length == 7) {
@@ -141,9 +141,7 @@ public class InventoryManagement {
                     
                     Item item = new Item(id, name, desc, price, unit, supplier, quantity);
                     items.add(item);
-                    System.out.println("Item added: " + item.getName()); // Debug statement
-                } else {
-                    System.out.println("Invalid item data: " + data);
+                   
                 }
             }
         } catch (FileNotFoundException e) {
@@ -153,8 +151,6 @@ public class InventoryManagement {
             System.out.println("An unexpected error occurred.");
             e.printStackTrace();
         }
-    
-        System.out.println("Total items loaded: " + items.size()); // Debug statement
     }
     
     
