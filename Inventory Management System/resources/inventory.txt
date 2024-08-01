@@ -1,3 +1,8 @@
 A001,milk,milkjy,100.0,L,dairy,0
+<<<<<<< HEAD
 A002,changed,testing,1000.0,L,dair,0
 A003,urmom,hi,10.0,L,dair,0
+=======
+A002,abehhdd,testing,1000.0,L,dair,0
+A003,abce,accc,10.0,L,kkk,0
+>>>>>>> 73d537273bf4f0bbce26a2078c1844f3df00d6b5
