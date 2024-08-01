@@ -220,7 +220,7 @@ public class InventoryManagement {
     private static void loadItemsData() {
         items.clear(); // clear existing list
         File file = new File(
-                "C:\\Users\\Acer\\OneDrive\\Desktop\\OOPT Java Assignment\\Inventory Management System\\resources\\inventory.txt");
+                "Inventory Management System\\resources\\inventory.txt");
 
         if (!file.exists()) {
             System.out.println("The file inventory.txt does not exist.");
