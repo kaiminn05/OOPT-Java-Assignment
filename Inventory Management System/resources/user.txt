@@ -1,1 +1,2 @@
 kaiminn05,kaiminn230305,19,Admin
+lwq,123456,20,Supplier Manager
