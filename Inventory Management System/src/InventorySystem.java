@@ -18,7 +18,7 @@ public class InventorySystem {
         System.out.println("Welcome to F&B Inventory Management System");
         System.out.println("==========================================");
         System.out.println("1. Login");
-        System.out.println("2. Register");
+        System.out.println("2. Register");//huh
         System.out.println("3. Exit");
         System.out.print("Enter your choice > ");
         int choice = scan.nextInt();
