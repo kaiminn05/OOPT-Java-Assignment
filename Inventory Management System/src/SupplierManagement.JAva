@@ -110,7 +110,7 @@ public class SupplierManagement {
 
     private static void updateSupplierInformation() {
         System.out.println("Update Supplier Information...");
-        
+
         List<Supplier> suppliers = readSuppliersFromFile();
         if (suppliers.isEmpty()) {
             System.out.println("No suppliers available to update.");
