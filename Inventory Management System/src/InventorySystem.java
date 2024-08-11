@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+
 public class InventorySystem {
     private static Scanner scan = new Scanner(System.in);
     private static User loggedInUser;
@@ -75,6 +76,7 @@ public class InventorySystem {
                     if (loggedInUser.getRole().equals("Admin") || loggedInUser.getRole().equals("Supplier Manager")) {
                         System.out.println("Accessing Supplier Management...");
                         sleepUtil.sleep(2000);
+                        
                         
                     } else {
                         System.out.println(ColorUtil.RED_BOLD + "Access denied. You do not have permission to access Supplier Management." + ColorUtil.RESET);
