@@ -1,0 +1,2 @@
+1,Milk,2,5.0,Dairy,100
+2,Cheese,69,10.0,Dairy,100
