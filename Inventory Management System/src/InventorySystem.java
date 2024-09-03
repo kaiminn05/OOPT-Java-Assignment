@@ -76,6 +76,7 @@ public class InventorySystem {
                     if (loggedInUser.getRole().equals("Admin") || loggedInUser.getRole().equals("Supplier Manager")) {
                         System.out.println("Accessing Supplier Management...");
                         sleepUtil.sleep(2000);
+                        SupplierManagement.showSupMenu();
                         
                         
                     } else {
