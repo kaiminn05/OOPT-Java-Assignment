@@ -67,6 +67,7 @@ public class InventorySystem {
                     if (loggedInUser.getRole().equals("Admin") || loggedInUser.getRole().equals("Stock Clerk")) {
                         System.out.println("Accessing Stock In & Restock...");
                         sleepUtil.sleep(2000);
+                        StockManagement.showStockMenu();
                     } else {
                         System.out.println(ColorUtil.RED_BOLD + "Access denied. You do not have permission to access Stock In & Restock." + ColorUtil.RESET);
                         sleepUtil.sleep(2000);
