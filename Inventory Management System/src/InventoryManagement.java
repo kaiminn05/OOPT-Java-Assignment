@@ -2,9 +2,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 public class InventoryManagement {
     private static Scanner scan = new Scanner(System.in);
@@ -46,19 +50,19 @@ public class InventoryManagement {
                     sleepUtil.sleep(2000);
                     break;
                 case 4:
-                    System.out.println("Delete Inventory Items...");
+                    deleteInventoryItem();
                     sleepUtil.sleep(2000);
                     break;
                 case 5:
-                    System.out.println("Search...");
+                    searchInventory();
                     sleepUtil.sleep(2000);
                     break;
                 case 6:
-                    System.out.println("Set Expiry Dates");
+                    setExpiryDate();
                     sleepUtil.sleep(2000);
                     break;
                 case 7:
-                    System.out.println("Check Expiry Dates");
+                    checkExpiryAlerts();
                     sleepUtil.sleep(2000);
                     break;
                 case 8:
@@ -91,7 +95,8 @@ public class InventoryManagement {
         scan.nextLine();
 
         String id = "A" + String.format("%03d", items.size() + 1);// generate unique ID for each items
-        Item newItem = new Item(id, name, desc, price, unit, supplier, quantity);
+        String expiryDate = "N/A";
+        Item newItem = new Item(id, name, desc, price, unit, supplier, quantity, expiryDate);
         items.add(newItem);
         boolean success = saveItemData(newItem);
 
@@ -104,24 +109,36 @@ public class InventoryManagement {
         }
     }
 
-    private static void displayInventory() { //display the inventory list(can be used for other part)
+    private static void displayInventory() { //display inventory item(can be use for other partt)
         System.out.println(
-                "========================================================================================================");
-        System.out.printf("%-10s %-20s %-20s %-10s %-10s %-20s %-10s%n",
-                "ID", "Name", "Description", "Price", "Unit", "Supplier", "Quantity");
+                "======================================================================================================================================");
+        System.out.printf("%-10s %-20s %-20s %-10s %-10s %-35s %-10s %-15s%n",
+                "ID", "Name", "Description", "Price", "Unit", "Supplier", "Quantity", "Expiry Date");
         System.out.println(
-                "========================================================================================================");
-
+                "=====================================================================================================================================");
+    
         for (Item item : items) {
-            System.out.printf("%-10s %-20s %-20s %-10.2f %-10s %-20s %-10d%n",
-                    item.getId(), item.getName(), item.getDesc(), item.getPrice(),
-                    item.getUnit(), item.getSupplier(), item.getQty());
+            String expiryDate = item.getExpiryDate();
+            //check if the expiry date is close to current date
+            if (isCloseToExpiry(expiryDate)) {
+                //if close then color will become red
+                System.out.printf("%-10s %-20s %-20s %-10.2f %-10s %-35s %-10d %-10s%n",
+                        item.getId(), item.getName(), item.getDesc(), item.getPrice(),
+                        item.getUnit(), item.getSupplier(), item.getQty(),
+                        ColorUtil.RED_BOLD + expiryDate + ColorUtil.RESET); 
+            } else {
+                //else just print like normal(with green color)
+                System.out.printf("%-10s %-20s %-20s %-10.2f %-10s %-35s %-10d %-10s%n",
+                        item.getId(), item.getName(), item.getDesc(), item.getPrice(),
+                        item.getUnit(), item.getSupplier(), item.getQty(), ColorUtil.GREEN_BOLD + expiryDate + ColorUtil.RESET);
+            }
         }
+    
         System.out.println(
-                "========================================================================================================");
+                "=====================================================================================================================================");
     }
 
-    private static void updateInventory() { //update inventory function
+    private static void updateInventory() { // update inventory function
         ClearScreenUtil.clearScreen();
         System.out.println("UPDATE INVENTORY ITEMS");
         System.out.println("=======================");
@@ -151,7 +168,7 @@ public class InventoryManagement {
         System.out.println("6. Update Quantity");
         System.out.print("Enter field number to update > ");
         int updateChoice = scan.nextInt();
-        scan.nextLine(); 
+        scan.nextLine();
 
         switch (updateChoice) {
             case 1:
@@ -165,7 +182,7 @@ public class InventoryManagement {
             case 3:
                 System.out.print("Enter new price: ");
                 itemToUpdate.setPrice(scan.nextDouble());
-                scan.nextLine(); // Consume newline
+                scan.nextLine(); 
                 break;
             case 4:
                 System.out.print("Enter new unit: ");
@@ -178,24 +195,246 @@ public class InventoryManagement {
             case 6:
                 System.out.print("Enter new quantity: ");
                 itemToUpdate.setQty(scan.nextInt());
-                scan.nextLine(); 
+                scan.nextLine();
                 break;
             default:
                 System.out.println("Invalid option.");
                 return;
         }
 
-        saveUpdatedData(); //save all data after update
+        saveUpdatedData(); // save all data after update
         System.out.println(ColorUtil.GREEN_BOLD + "Item updated successfully." + ColorUtil.RESET);
     }
 
-    private static boolean saveItemData(Item item) { //this if use for add items with append TRUE so that data wont replace previous data
+    private static void deleteInventoryItem() {
+        ClearScreenUtil.clearScreen();
+        System.out.println("DELETE INVENTORY ITEMS");
+        System.out.println("=======================");
+        displayInventory();
+        System.out.print("Enter item ID to delete > ");
+        String itemId = scan.nextLine();
+
+        Item itemToDelete = null;
+        for (Item item : items) {
+            if (item.getId().equalsIgnoreCase(itemId)) {
+                itemToDelete = item;
+                break;
+            }
+        }
+
+        if (itemToDelete == null) {
+            System.out.println(ColorUtil.RED_BOLD + "Item ID not found." + ColorUtil.RESET);
+            return;
+        }
+
+        items.remove(itemToDelete); //remove item from the list
+        saveUpdatedData(); // save updated data
+
+        System.out.println(ColorUtil.GREEN_BOLD + "Item deleted successfully." + ColorUtil.RESET);
+        sleepUtil.sleep(2000);
+    }
+
+    private static void searchInventory() {
+        ClearScreenUtil.clearScreen();
+        System.out.println("SEARCH INVENTORY");
+        System.out.println("=======================");
+        System.out.print("Enter keyword to search (name, description, or supplier): ");
+        String keyword = scan.nextLine().toLowerCase();
+
+        List<Item> matchingItems = new ArrayList<>();
+
+        //find through items based on the keyword
+        for (Item item : items) {
+            if (item.getName().toLowerCase().contains(keyword) ||
+                    item.getDesc().toLowerCase().contains(keyword) ||
+                    item.getSupplier().toLowerCase().contains(keyword)) {
+                matchingItems.add(item);
+            }
+        }
+
+        //display search result
+        if (matchingItems.isEmpty()) {
+            System.out.println(ColorUtil.RED_BOLD + "No items found matching the search criteria." + ColorUtil.RESET);
+        } else {
+            System.out.println("Matching Inventory Items:");
+            System.out.println(
+                    "========================================================================================================");
+            System.out.printf("%-10s %-20s %-20s %-10s %-10s %-20s %-10s%n",
+                    "ID", "Name", "Description", "Price", "Unit", "Supplier", "Quantity");
+            System.out.println(
+                    "========================================================================================================");
+
+            for (Item item : matchingItems) {
+                System.out.printf("%-10s %-20s %-20s %-10.2f %-10s %-20s %-10d%n",
+                        item.getId(), item.getName(), item.getDesc(), item.getPrice(),
+                        item.getUnit(), item.getSupplier(), item.getQty());
+            }
+            System.out.println(
+                    "========================================================================================================");
+        }
+
+        System.out.print("Press any key to continue....");
+        scan.nextLine();
+    }
+
+    private static void setExpiryDate() {
+        ClearScreenUtil.clearScreen();
+        System.out.println("SET EXPIRY DATE");
+        System.out.println("=======================");
+        displayInventory();
+        System.out.print("Enter item ID to set expiry date > ");
+        String itemId = scan.nextLine();
+
+        Item itemToSetExpiry = null;
+        for (Item item : items) {
+            if (item.getId().equalsIgnoreCase(itemId)) { //ignore the upper lowerr case
+                itemToSetExpiry = item;
+                break;
+            }
+        }
+
+        if (itemToSetExpiry == null) {
+            System.out.println(ColorUtil.RED_BOLD + "Item ID not found." + ColorUtil.RESET);
+            return;
+        }
+
+        String expiryDate;
+        while (true) {
+            System.out.print("Enter expiry date (dd/MM/yyyy): ");
+            expiryDate = scan.nextLine();
+
+            //validate date
+            if (isValidExpiryDate(expiryDate)) {
+                break; 
+            } else {
+                System.out.println(ColorUtil.RED_BOLD
+                        + "Invalid expiry date format or date in the past. Please try again." + ColorUtil.RESET);
+            }
+        }
+
+        itemToSetExpiry.setExpiryDate(expiryDate);
+        saveUpdatedData();
+
+        System.out.println(ColorUtil.GREEN_BOLD + "Expiry date set successfully." + ColorUtil.RESET);
+        sleepUtil.sleep(2000);
+    }
+
+    private static void checkExpiryAlerts() {
+        ClearScreenUtil.clearScreen();
+        System.out.println("CHECK EXPIRY ALERTS");
+        System.out.println("============================================================================================");
+        System.out.printf("%-10s %-20s %-20s %-15s %-15s%n", "ID", "Name", "Expiry Date", "Days Remaining", "Alert");
+    
+        for (Item item : items) {
+            String expiryDate = item.getExpiryDate();
+            long daysRemaining = calculateDaysUntilExpiry(expiryDate);
+    
+            if (daysRemaining < 0) { //if date already passed
+                System.out.printf("%-10s %-20s %-20s %-15s %s%n", item.getId(), item.getName(), expiryDate, "Expired", ColorUtil.RED_BOLD + "Expired" + ColorUtil.RESET);
+            } else if (isNearExpiry(expiryDate)) {
+                //near expired(30dayas)
+                System.out.printf("%-10s %-20s %-20s %s%-15d%s %s%n", 
+                    item.getId(), item.getName(), expiryDate, 
+                    ColorUtil.RED_BOLD, daysRemaining, ColorUtil.RESET, 
+                    ColorUtil.RED_BOLD + "Near Expiry" + ColorUtil.RESET);
+            } else {
+                //not expiered
+                System.out.printf("%-10s %-20s %-20s %s%-15d%s %s%n", 
+                    item.getId(), item.getName(), expiryDate, 
+                    ColorUtil.GREEN_BOLD, daysRemaining, ColorUtil.RESET, 
+                    ColorUtil.GREEN_BOLD + "Safe" + ColorUtil.RESET);
+            }
+        }
+    
+        System.out.println("============================================================================================");
+        System.out.print("Press any key to continue....");
+        scan.nextLine();
+    }
+
+    public static void showExpiryNotifications() {
+        System.out.println("========== Expiry Date Alerts ==========");
+        boolean hasAlerts = false;
+        
+        for (Item item : items) {
+            String expiryDate = item.getExpiryDate();
+            long daysRemaining = calculateDaysUntilExpiry(expiryDate);
+
+            
+            if (isNearExpiry(expiryDate)) {
+                System.out.printf("%sWARNING: %s%s is close to expiry! Expiry Date: %s (%d days remaining)%s%n",
+                        ColorUtil.RED_BOLD, item.getName(), ColorUtil.RESET, expiryDate, daysRemaining, ColorUtil.RESET);
+                hasAlerts = true;
+            }
+        }
+    
+        if (!hasAlerts) {
+            System.out.println("No items are close to expiry.");
+        }
+    
+        System.out.println("========================================");
+    }
+    
+    
+    private static boolean isValidExpiryDate(String date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        dateFormat.setLenient(false); 
+        try {
+            Date expiry = dateFormat.parse(date); 
+            Date today = new Date(); //get today date
+            if (expiry.before(today)) {
+                return false; //if expiry dat eis before today then return false
+            }
+            return true;
+        } catch (ParseException e) {
+            return false; //return false if date format wrong
+        }
+    }
+
+    private static boolean isCloseToExpiry(String expiryDateStr) {
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    try {
+        Date expiryDate = dateFormat.parse(expiryDateStr);
+        Date today = new Date();
+        
+       //calc the diff
+        long diffInMillies = Math.abs(expiryDate.getTime() - today.getTime());
+        long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+        
+        //if difference below or equal to 30 day then return true
+        return diffInDays <= 30 && expiryDate.after(today); 
+    } catch (ParseException e) {
+        return false;
+        }
+    }
+
+    private static long calculateDaysUntilExpiry(String expiryDateStr) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"); //make sure the format is correct
+        try {
+            Date expiryDate = dateFormat.parse(expiryDateStr);
+            Date today = new Date(); //get today date
+            long diffInMillies = expiryDate.getTime() - today.getTime(); //time differences
+    
+            return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS); 
+        } catch (ParseException e) {
+            System.out.println("Error parsing date: " + expiryDateStr);
+            return -1; 
+        }
+    }
+    
+    private static boolean isNearExpiry(String expiryDateStr) {
+        long daysRemaining = calculateDaysUntilExpiry(expiryDateStr);
+        return daysRemaining > 0 && daysRemaining <= 30; // consider as near expiry if within 30 days
+    }
+
+    private static boolean saveItemData(Item item) { // this if use for add items with append TRUE so that data wont
+                                                     // replace previous data
         try (FileWriter writer = new FileWriter(
                 "Inventory Management System\\resources\\inventory.txt",
                 true)) { // write in append mode so that exist items
             // wont replace new item
             writer.write(item.getId() + "," + item.getName() + "," + item.getDesc() + "," + item.getPrice() + ","
-                    + item.getUnit() + "," + item.getSupplier() + "," + item.getQty() + "\n");
+                    + item.getUnit() + "," + item.getSupplier() + "," + item.getQty() + "," + item.getExpiryDate()
+                    + "\n");
             return true;
         } catch (IOException e) {
             System.out.println("Error saving item data.");
@@ -203,12 +442,14 @@ public class InventoryManagement {
             return false;
         }
     }
-    private static boolean saveUpdatedData() { //this is use for update items information without append TRUE
+    
+    private static boolean saveUpdatedData() { // this is use for update items information without append TRUE
         try (FileWriter writer = new FileWriter(
                 "Inventory Management System\\resources\\inventory.txt")) {
             for (Item item : items) {
                 writer.write(item.getId() + "," + item.getName() + "," + item.getDesc() + "," + item.getPrice() + ","
-                        + item.getUnit() + "," + item.getSupplier() + "," + item.getQty() + "\n");
+                        + item.getUnit() + "," + item.getSupplier() + "," + item.getQty() + "," + item.getExpiryDate()
+                        + "\n");
             }
             return true;
         } catch (IOException e) {
@@ -217,7 +458,8 @@ public class InventoryManagement {
             return false;
         }
     }
-    private static void loadItemsData() {
+
+    public static void loadItemsData() {
         items.clear(); // clear existing list
         File file = new File(
                 "Inventory Management System\\resources\\inventory.txt");
@@ -232,7 +474,7 @@ public class InventoryManagement {
                 String data = fileScanner.nextLine();
 
                 String[] itemDetails = data.split(",");
-                if (itemDetails.length == 7) {
+                if (itemDetails.length == 8) { 
                     String id = itemDetails[0];
                     String name = itemDetails[1];
                     String desc = itemDetails[2];
@@ -240,11 +482,12 @@ public class InventoryManagement {
                     String unit = itemDetails[4];
                     String supplier = itemDetails[5];
                     int quantity = Integer.parseInt(itemDetails[6]);
+                    String expiryDate = itemDetails[7]; 
 
-                    Item item = new Item(id, name, desc, price, unit, supplier, quantity);
+                    Item item = new Item(id, name, desc, price, unit, supplier, quantity, expiryDate);
                     items.add(item);
-
                 }
+
             }
         } catch (FileNotFoundException e) {
             System.out.println("An error occurred while loading items data.");
@@ -263,8 +506,10 @@ public class InventoryManagement {
         private String unit;
         private String supplier;
         private int quantity;
+        private String expiryDate;
 
-        public Item(String id, String name, String desc, double price, String unit, String supplier, int quantity) {
+        public Item(String id, String name, String desc, double price, String unit, String supplier, int quantity,
+                String expiryDate) {
             this.id = id;
             this.name = name;
             this.desc = desc;
@@ -272,6 +517,7 @@ public class InventoryManagement {
             this.unit = unit;
             this.supplier = supplier;
             this.quantity = quantity;
+            this.expiryDate = expiryDate;
         }
 
         public String getId() {
@@ -300,7 +546,11 @@ public class InventoryManagement {
 
         public int getQty() {
             return quantity;
-        }  
+        }
+
+        public String getExpiryDate() {
+            return expiryDate;
+        }
 
         public void setName(String name) {
             this.name = name;
@@ -324,6 +574,10 @@ public class InventoryManagement {
 
         public void setQty(int quantity) {
             this.quantity = quantity;
+        }
+
+        public void setExpiryDate(String expiryDate) {
+            this.expiryDate = expiryDate;
         }
     }
 }

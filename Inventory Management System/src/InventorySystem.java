@@ -6,20 +6,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-
 public class InventorySystem {
     private static Scanner scan = new Scanner(System.in);
     private static User loggedInUser;
+
     public static void main(String[] args) {
         showLoginMenu();
     }
 
     public static void showLoginMenu() {
+        InventoryManagement.loadItemsData();
         ClearScreenUtil.clearScreen();
         System.out.println("Welcome to F&B Inventory Management System");
         System.out.println("==========================================");
         System.out.println("1. Login");
-        System.out.println("2. Register");//huh
+        System.out.println("2. Register");// huh
         System.out.println("3. Exit");
         System.out.print("Enter your choice > ");
         int choice = scan.nextInt();
@@ -42,6 +43,16 @@ public class InventorySystem {
     public static void showMainMenu() {
         while (true) {
             ClearScreenUtil.clearScreen();
+            showLoading();
+            sleepUtil.sleep(2000); 
+            ClearScreenUtil.clearScreen();
+            //show the notification
+            InventoryManagement.showExpiryNotifications();
+
+            System.out.println("Press Enter to continue to the main menu...");
+            scan.nextLine(); 
+
+            ClearScreenUtil.clearScreen();
             System.out.println("\nF&B Inventory Management System");
             System.out.println("1. Inventory Management");
             System.out.println("2. Stock In & Restock");
@@ -50,7 +61,7 @@ public class InventorySystem {
             System.out.println("5. Logout");
             System.out.print("Enter your choice > ");
             int choice = scan.nextInt();
-            scan.nextLine(); 
+            scan.nextLine();
 
             switch (choice) {
                 case 1:
@@ -59,7 +70,9 @@ public class InventorySystem {
                         sleepUtil.sleep(2000);
                         InventoryManagement.showInvMenu();
                     } else {
-                        System.out.println(ColorUtil.RED_BOLD + "Access denied. You do not have permission to access Inventory Management." + ColorUtil.RESET);
+                        System.out.println(ColorUtil.RED_BOLD
+                                + "Access denied. You do not have permission to access Inventory Management."
+                                + ColorUtil.RESET);
                         sleepUtil.sleep(2000);
                     }
                     break;
@@ -69,7 +82,9 @@ public class InventorySystem {
                         sleepUtil.sleep(2000);
                         StockManagement.showStockMenu();
                     } else {
-                        System.out.println(ColorUtil.RED_BOLD + "Access denied. You do not have permission to access Stock In & Restock." + ColorUtil.RESET);
+                        System.out.println(ColorUtil.RED_BOLD
+                                + "Access denied. You do not have permission to access Stock In & Restock."
+                                + ColorUtil.RESET);
                         sleepUtil.sleep(2000);
                     }
                     break;
@@ -78,10 +93,11 @@ public class InventorySystem {
                         System.out.println("Accessing Supplier Management...");
                         sleepUtil.sleep(2000);
                         SupplierManagement.showSupMenu();
-                        
-                        
+
                     } else {
-                        System.out.println(ColorUtil.RED_BOLD + "Access denied. You do not have permission to access Supplier Management." + ColorUtil.RESET);
+                        System.out.println(ColorUtil.RED_BOLD
+                                + "Access denied. You do not have permission to access Supplier Management."
+                                + ColorUtil.RESET);
                         sleepUtil.sleep(2000);
                     }
                     break;
@@ -94,7 +110,7 @@ public class InventorySystem {
                     System.out.println(ColorUtil.GREEN_BOLD + "Logged out successfully." + ColorUtil.RESET);
                     sleepUtil.sleep(2000);
                     showLoginMenu();
-                    return; //return to login menu
+                    return; // return to login menu
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
@@ -140,11 +156,10 @@ public class InventorySystem {
         }
     }
 
-
     private static void register() {
         List<User> users = retrieveUserData();
         while (true) {
-            ClearScreenUtil.clearScreen(); 
+            ClearScreenUtil.clearScreen();
             System.out.println("REGISTER");
             System.out.println("===========");
             System.out.print("Enter username: ");
@@ -152,7 +167,8 @@ public class InventorySystem {
             boolean usernameExists = false;
             for (User user : users) {
                 if (user.getUsername().equals(username)) {
-                    System.out.println("Username \"" + ColorUtil.CYAN_BOLD + username + ColorUtil.RESET + "\" already exists.");
+                    System.out.println(
+                            "Username \"" + ColorUtil.CYAN_BOLD + username + ColorUtil.RESET + "\" already exists.");
                     sleepUtil.sleep(2000);
                     ClearScreenUtil.clearScreen();
                     usernameExists = true;
@@ -206,7 +222,8 @@ public class InventorySystem {
             boolean success = saveUserData(users);
 
             if (success) {
-                System.out.println(ColorUtil.GREEN_BOLD + "Registration successful! You can now login." + ColorUtil.RESET);
+                System.out.println(
+                        ColorUtil.GREEN_BOLD + "Registration successful! You can now login." + ColorUtil.RESET);
                 sleepUtil.sleep(2000);
                 showLoginMenu();
                 break;
@@ -258,20 +275,29 @@ public class InventorySystem {
         }
     }
 
+    private static void showLoading() {
+        ClearScreenUtil.clearScreen();  
+        System.out.print(ColorUtil.YELLOW_BOLD + "Loading Data" + ColorUtil.RESET);
+        for (int i = 0; i < 5; i++) {  //print the dot
+            System.out.print(ColorUtil.YELLOW_BOLD+ "." + ColorUtil.RESET); 
+            sleepUtil.sleep(1000);  
+        }
+    }
     private static class User {
         private String username;
         private String password;
         private int age;
         private String role;
 
-        //constrctur for user
+        // constrctur for user
         public User(String username, String password, int age, String role) {
             this.username = username;
             this.password = password;
             this.age = age;
             this.role = role;
         }
-        //get
+
+        // get
         public String getUsername() {
             return username;
         }
