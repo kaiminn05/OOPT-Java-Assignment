@@ -81,20 +81,84 @@ public class InventoryManagement {
         System.out.println("=========================");
         System.out.print("Enter item name: ");
         String name = scan.nextLine();
+        while (name.length() > 20 || name.isEmpty()) {
+            if (name.isEmpty()) {
+                System.out.println(ColorUtil.RED_BOLD + "The name field cannot be empty." + ColorUtil.RESET);
+                sleepUtil.sleep(1500);
+                ClearScreenUtil.clearPreviousLine();
+                ClearScreenUtil.clearPreviousLine();
+            } else {
+                System.out.println(ColorUtil.RED_BOLD + "The maximum name for item is 20 character" + ColorUtil.RESET);
+                sleepUtil.sleep(2000);
+                ClearScreenUtil.clearPreviousLine();
+                ClearScreenUtil.clearPreviousLine();
+            }
+            System.out.print("Enter item name: ");
+            name = scan.nextLine();
+        }
         System.out.print("Enter item description: ");
         String desc = scan.nextLine();
+        while (desc.length() > 20 || desc.isEmpty()) {
+            if (desc.isEmpty()) {
+                desc = "N/A";
+            } else {
+                System.out.println("The max item description is 20 characters.");
+                sleepUtil.sleep(2000);
+                ClearScreenUtil.clearPreviousLine();
+                ClearScreenUtil.clearPreviousLine();
+                System.out.print("Enter Description: ");
+                desc = scan.nextLine();
+            }
+        }
+
+        double price;
         System.out.print("Enter item price: ");
-        double price = scan.nextDouble();
+        while (true) {
+            if (scan.hasNextDouble()) {
+                price = scan.nextDouble();
+                if (price < 0) {
+                    System.out.println(ColorUtil.RED + "The item price should be positive." + ColorUtil.RESET);
+                    sleepUtil.sleep(1500);
+                    ClearScreenUtil.clearPreviousLine();
+                    ClearScreenUtil.clearPreviousLine();
+                    System.out.print("Enter item price: ");
+                } else {
+                    break;
+                }
+            } else {
+                System.out
+                        .println(ColorUtil.RED_BOLD + "Invalid input. Please enter a valid number." + ColorUtil.RESET);
+                sleepUtil.sleep(1500);
+                ClearScreenUtil.clearPreviousLine();
+                ClearScreenUtil.clearPreviousLine();
+                scan.next();
+                System.out.print("Enter item price: ");
+            }
+        }
+
         scan.nextLine();
         System.out.print("Enter item unit: ");
         String unit = scan.nextLine();
+        while(unit.length() > 10 || unit.isEmpty()){
+            if(unit.isEmpty()){
+                System.out.println(ColorUtil.RED_BOLD + "Item unit field cannot be empty." + ColorUtil.RESET);
+                sleepUtil.sleep(2000);
+                ClearScreenUtil.clearPreviousLine();
+                ClearScreenUtil.clearPreviousLine();
+            }else{
+                System.out.print(ColorUtil.RED_BOLD + "The maximum character for item unit is 10." + ColorUtil.RESET);
+                sleepUtil.sleep(2000);
+                ClearScreenUtil.clearPreviousLine();
+                ClearScreenUtil.clearPreviousLine();
+            }
+            System.out.print("Enter item unit: ");
+            unit = scan.nextLine();
+        }
         System.out.print("Enter item supplier: ");
         String supplier = scan.nextLine();
-        System.out.print("Enter item quantity: ");
-        int quantity = scan.nextInt();
-        scan.nextLine();
 
         String id = "A" + String.format("%03d", items.size() + 1);// generate unique ID for each items
+        int quantity = 0;
         String expiryDate = "N/A";
         Item newItem = new Item(id, name, desc, price, unit, supplier, quantity, expiryDate);
         items.add(newItem);
@@ -109,31 +173,32 @@ public class InventoryManagement {
         }
     }
 
-    private static void displayInventory() { //display inventory item(can be use for other partt)
+    private static void displayInventory() { // display inventory item(can be use for other partt)
         System.out.println(
                 "======================================================================================================================================");
         System.out.printf("%-10s %-20s %-20s %-10s %-10s %-35s %-10s %-15s%n",
                 "ID", "Name", "Description", "Price", "Unit", "Supplier", "Quantity", "Expiry Date");
         System.out.println(
                 "=====================================================================================================================================");
-    
+
         for (Item item : items) {
             String expiryDate = item.getExpiryDate();
-            //check if the expiry date is close to current date
+            // check if the expiry date is close to current date
             if (isCloseToExpiry(expiryDate)) {
-                //if close then color will become red
+                // if close then color will become red
                 System.out.printf("%-10s %-20s %-20s %-10.2f %-10s %-35s %-10d %-10s%n",
                         item.getId(), item.getName(), item.getDesc(), item.getPrice(),
                         item.getUnit(), item.getSupplier(), item.getQty(),
-                        ColorUtil.RED_BOLD + expiryDate + ColorUtil.RESET); 
+                        ColorUtil.RED_BOLD + expiryDate + ColorUtil.RESET);
             } else {
-                //else just print like normal(with green color)
+                // else just print like normal(with green color)
                 System.out.printf("%-10s %-20s %-20s %-10.2f %-10s %-35s %-10d %-10s%n",
                         item.getId(), item.getName(), item.getDesc(), item.getPrice(),
-                        item.getUnit(), item.getSupplier(), item.getQty(), ColorUtil.GREEN_BOLD + expiryDate + ColorUtil.RESET);
+                        item.getUnit(), item.getSupplier(), item.getQty(),
+                        ColorUtil.GREEN_BOLD + expiryDate + ColorUtil.RESET);
             }
         }
-    
+
         System.out.println(
                 "=====================================================================================================================================");
     }
@@ -182,7 +247,7 @@ public class InventoryManagement {
             case 3:
                 System.out.print("Enter new price: ");
                 itemToUpdate.setPrice(scan.nextDouble());
-                scan.nextLine(); 
+                scan.nextLine();
                 break;
             case 4:
                 System.out.print("Enter new unit: ");
@@ -227,7 +292,7 @@ public class InventoryManagement {
             return;
         }
 
-        items.remove(itemToDelete); //remove item from the list
+        items.remove(itemToDelete); // remove item from the list
         saveUpdatedData(); // save updated data
 
         System.out.println(ColorUtil.GREEN_BOLD + "Item deleted successfully." + ColorUtil.RESET);
@@ -243,7 +308,7 @@ public class InventoryManagement {
 
         List<Item> matchingItems = new ArrayList<>();
 
-        //find through items based on the keyword
+        // find through items based on the keyword
         for (Item item : items) {
             if (item.getName().toLowerCase().contains(keyword) ||
                     item.getDesc().toLowerCase().contains(keyword) ||
@@ -252,7 +317,7 @@ public class InventoryManagement {
             }
         }
 
-        //display search result
+        // display search result
         if (matchingItems.isEmpty()) {
             System.out.println(ColorUtil.RED_BOLD + "No items found matching the search criteria." + ColorUtil.RESET);
         } else {
@@ -287,7 +352,7 @@ public class InventoryManagement {
 
         Item itemToSetExpiry = null;
         for (Item item : items) {
-            if (item.getId().equalsIgnoreCase(itemId)) { //ignore the upper lowerr case
+            if (item.getId().equalsIgnoreCase(itemId)) { // ignore the upper lowerr case
                 itemToSetExpiry = item;
                 break;
             }
@@ -303,9 +368,9 @@ public class InventoryManagement {
             System.out.print("Enter expiry date (dd/MM/yyyy): ");
             expiryDate = scan.nextLine();
 
-            //validate date
+            // validate date
             if (isValidExpiryDate(expiryDate)) {
-                break; 
+                break;
             } else {
                 System.out.println(ColorUtil.RED_BOLD
                         + "Invalid expiry date format or date in the past. Please try again." + ColorUtil.RESET);
@@ -322,31 +387,34 @@ public class InventoryManagement {
     private static void checkExpiryAlerts() {
         ClearScreenUtil.clearScreen();
         System.out.println("CHECK EXPIRY ALERTS");
-        System.out.println("============================================================================================");
+        System.out.println(
+                "============================================================================================");
         System.out.printf("%-10s %-20s %-20s %-15s %-15s%n", "ID", "Name", "Expiry Date", "Days Remaining", "Alert");
-    
+
         for (Item item : items) {
             String expiryDate = item.getExpiryDate();
             long daysRemaining = calculateDaysUntilExpiry(expiryDate);
-    
-            if (daysRemaining < 0) { //if date already passed
-                System.out.printf("%-10s %-20s %-20s %-15s %s%n", item.getId(), item.getName(), expiryDate, "Expired", ColorUtil.RED_BOLD + "Expired" + ColorUtil.RESET);
+
+            if (daysRemaining < 0) { // if date already passed
+                System.out.printf("%-10s %-20s %-20s %-15s %s%n", item.getId(), item.getName(), expiryDate, "Expired",
+                        ColorUtil.RED_BOLD + "Expired" + ColorUtil.RESET);
             } else if (isNearExpiry(expiryDate)) {
-                //near expired(30dayas)
-                System.out.printf("%-10s %-20s %-20s %s%-15d%s %s%n", 
-                    item.getId(), item.getName(), expiryDate, 
-                    ColorUtil.RED_BOLD, daysRemaining, ColorUtil.RESET, 
-                    ColorUtil.RED_BOLD + "Near Expiry" + ColorUtil.RESET);
+                // near expired(30dayas)
+                System.out.printf("%-10s %-20s %-20s %s%-15d%s %s%n",
+                        item.getId(), item.getName(), expiryDate,
+                        ColorUtil.RED_BOLD, daysRemaining, ColorUtil.RESET,
+                        ColorUtil.RED_BOLD + "Near Expiry" + ColorUtil.RESET);
             } else {
-                //not expiered
-                System.out.printf("%-10s %-20s %-20s %s%-15d%s %s%n", 
-                    item.getId(), item.getName(), expiryDate, 
-                    ColorUtil.GREEN_BOLD, daysRemaining, ColorUtil.RESET, 
-                    ColorUtil.GREEN_BOLD + "Safe" + ColorUtil.RESET);
+                // not expiered
+                System.out.printf("%-10s %-20s %-20s %s%-15d%s %s%n",
+                        item.getId(), item.getName(), expiryDate,
+                        ColorUtil.GREEN_BOLD, daysRemaining, ColorUtil.RESET,
+                        ColorUtil.GREEN_BOLD + "Safe" + ColorUtil.RESET);
             }
         }
-    
-        System.out.println("============================================================================================");
+
+        System.out.println(
+                "============================================================================================");
         System.out.print("Press any key to continue....");
         scan.nextLine();
     }
@@ -354,73 +422,72 @@ public class InventoryManagement {
     public static void showExpiryNotifications() {
         System.out.println("========== Expiry Date Alerts ==========");
         boolean hasAlerts = false;
-        
+
         for (Item item : items) {
             String expiryDate = item.getExpiryDate();
             long daysRemaining = calculateDaysUntilExpiry(expiryDate);
 
-            
             if (isNearExpiry(expiryDate)) {
                 System.out.printf("%sWARNING: %s%s is close to expiry! Expiry Date: %s (%d days remaining)%s%n",
-                        ColorUtil.RED_BOLD, item.getName(), ColorUtil.RESET, expiryDate, daysRemaining, ColorUtil.RESET);
+                        ColorUtil.RED_BOLD, item.getName(), ColorUtil.RESET, expiryDate, daysRemaining,
+                        ColorUtil.RESET);
                 hasAlerts = true;
             }
         }
-    
+
         if (!hasAlerts) {
             System.out.println("No items are close to expiry.");
         }
-    
+
         System.out.println("========================================");
     }
-    
-    
+
     private static boolean isValidExpiryDate(String date) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        dateFormat.setLenient(false); 
+        dateFormat.setLenient(false);
         try {
-            Date expiry = dateFormat.parse(date); 
-            Date today = new Date(); //get today date
+            Date expiry = dateFormat.parse(date);
+            Date today = new Date(); // get today date
             if (expiry.before(today)) {
-                return false; //if expiry dat eis before today then return false
+                return false; // if expiry dat eis before today then return false
             }
             return true;
         } catch (ParseException e) {
-            return false; //return false if date format wrong
+            return false; // return false if date format wrong
         }
     }
 
     private static boolean isCloseToExpiry(String expiryDateStr) {
-    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-    try {
-        Date expiryDate = dateFormat.parse(expiryDateStr);
-        Date today = new Date();
-        
-       //calc the diff
-        long diffInMillies = Math.abs(expiryDate.getTime() - today.getTime());
-        long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-        
-        //if difference below or equal to 30 day then return true
-        return diffInDays <= 30 && expiryDate.after(today); 
-    } catch (ParseException e) {
-        return false;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        try {
+            Date expiryDate = dateFormat.parse(expiryDateStr);
+            Date today = new Date();
+
+            // calc the diff
+            long diffInMillies = Math.abs(expiryDate.getTime() - today.getTime());
+            long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+
+            // if difference below or equal to 30 day then return true
+            return diffInDays <= 30 && expiryDate.after(today);
+        } catch (ParseException e) {
+            return false;
         }
     }
 
     private static long calculateDaysUntilExpiry(String expiryDateStr) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"); //make sure the format is correct
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"); // make sure the format is correct
         try {
             Date expiryDate = dateFormat.parse(expiryDateStr);
-            Date today = new Date(); //get today date
-            long diffInMillies = expiryDate.getTime() - today.getTime(); //time differences
-    
-            return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS); 
+            Date today = new Date(); // get today date
+            long diffInMillies = expiryDate.getTime() - today.getTime(); // time differences
+
+            return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
         } catch (ParseException e) {
             System.out.println("Error parsing date: " + expiryDateStr);
-            return -1; 
+            return -1;
         }
     }
-    
+
     private static boolean isNearExpiry(String expiryDateStr) {
         long daysRemaining = calculateDaysUntilExpiry(expiryDateStr);
         return daysRemaining > 0 && daysRemaining <= 30; // consider as near expiry if within 30 days
@@ -442,7 +509,7 @@ public class InventoryManagement {
             return false;
         }
     }
-    
+
     private static boolean saveUpdatedData() { // this is use for update items information without append TRUE
         try (FileWriter writer = new FileWriter(
                 "Inventory Management System\\resources\\inventory.txt")) {
@@ -474,7 +541,7 @@ public class InventoryManagement {
                 String data = fileScanner.nextLine();
 
                 String[] itemDetails = data.split(",");
-                if (itemDetails.length == 8) { 
+                if (itemDetails.length == 8) {
                     String id = itemDetails[0];
                     String name = itemDetails[1];
                     String desc = itemDetails[2];
@@ -482,7 +549,7 @@ public class InventoryManagement {
                     String unit = itemDetails[4];
                     String supplier = itemDetails[5];
                     int quantity = Integer.parseInt(itemDetails[6]);
-                    String expiryDate = itemDetails[7]; 
+                    String expiryDate = itemDetails[7];
 
                     Item item = new Item(id, name, desc, price, unit, supplier, quantity, expiryDate);
                     items.add(item);

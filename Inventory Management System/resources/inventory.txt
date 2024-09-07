@@ -1,3 +1,5 @@
 A001,Dairy Milk,MILK,10.0,Litre,Dairy Product,0,05/12/2024
-A002,Tomato,Vegetable,5.0,0,Grocer SDN BHD,0,23/05/2025
+A002,Tomato,Vegetable,5.0,KG,Grocer SDN BHD,0,23/05/2025
 A003,Carrot,hmm,20.0,KG,Vege SDN BHD,0,30/9/2024
+A004,Chicken Breast,-,25.0,KG,FROZEN SDN BHD,0,26/09/2024
+A005,Potato,N/A,25.0,KG,FreshMart SDB BHD,0,N/A
