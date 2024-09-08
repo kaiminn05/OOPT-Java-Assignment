@@ -139,13 +139,13 @@ public class InventoryManagement {
         scan.nextLine();
         System.out.print("Enter item unit: ");
         String unit = scan.nextLine();
-        while(unit.length() > 10 || unit.isEmpty()){
-            if(unit.isEmpty()){
+        while (unit.length() > 10 || unit.isEmpty()) {
+            if (unit.isEmpty()) {
                 System.out.println(ColorUtil.RED_BOLD + "Item unit field cannot be empty." + ColorUtil.RESET);
                 sleepUtil.sleep(2000);
                 ClearScreenUtil.clearPreviousLine();
                 ClearScreenUtil.clearPreviousLine();
-            }else{
+            } else {
                 System.out.print(ColorUtil.RED_BOLD + "The maximum character for item unit is 10." + ColorUtil.RESET);
                 sleepUtil.sleep(2000);
                 ClearScreenUtil.clearPreviousLine();
@@ -154,6 +154,7 @@ public class InventoryManagement {
             System.out.print("Enter item unit: ");
             unit = scan.nextLine();
         }
+
         System.out.print("Enter item supplier: ");
         String supplier = scan.nextLine();
 
@@ -208,12 +209,12 @@ public class InventoryManagement {
         System.out.println("UPDATE INVENTORY ITEMS");
         System.out.println("=======================");
         displayInventory();
-        System.out.print("Enter item ID to choose > ");
+        System.out.print("Enter item ID to choose > A");
         String itemId = scan.nextLine();
 
         Item itemToUpdate = null;
         for (Item item : items) {
-            if (item.getId().equalsIgnoreCase(itemId)) {
+            if (item.getId().equalsIgnoreCase("A" + itemId)) {
                 itemToUpdate = item;
                 break;
             }
@@ -223,8 +224,8 @@ public class InventoryManagement {
             System.out.println("Item ID not found.");
             return;
         }
-
-        System.out.println("Selected Item: " + itemToUpdate.getName());
+        ClearScreenUtil.clearScreen();
+        System.out.println("Selected Item: " + ColorUtil.YELLOW_BOLD + itemToUpdate.getName() + ColorUtil.RESET);
         System.out.println("1. Update Name");
         System.out.println("2. Update Description");
         System.out.println("3. Update Price");
@@ -235,10 +236,34 @@ public class InventoryManagement {
         int updateChoice = scan.nextInt();
         scan.nextLine();
 
+        while (updateChoice < 1 || updateChoice > 6) {
+            System.out.println(ColorUtil.RED_BOLD + "Try again. Please choose a valid option." + ColorUtil.RESET);
+            sleepUtil.sleep(2000);
+            ClearScreenUtil.clearPreviousLine();
+            ClearScreenUtil.clearPreviousLine();
+            System.out.print("Enter field number to update > ");
+            updateChoice = scan.nextInt();
+            scan.nextLine();
+        }
         switch (updateChoice) {
             case 1:
                 System.out.print("Enter new name: ");
-                itemToUpdate.setName(scan.nextLine());
+                String newname = scan.nextLine();
+                while(newname.length() > 20 || newname.isEmpty() || newname.equals(itemToUpdate.getName())){
+                    if(newname.isEmpty()){
+                        System.out.println(ColorUtil.RED_BOLD + "Name cannot be empty." + ColorUtil.RESET);
+                    }else if(newname.equals(itemToUpdate.getName())){
+                        System.out.println(ColorUtil.RED_BOLD + "Same name cannot be updated." + ColorUtil.RESET);
+                    }else{
+                        System.out.println(ColorUtil.RED_BOLD + "Maximum character for name is 20." +  ColorUtil.RESET);
+                    }
+                    sleepUtil.sleep(2000);
+                    ClearScreenUtil.clearPreviousLine();
+                    ClearScreenUtil.clearPreviousLine();
+                    System.out.print("Enter new name: ");
+                    newname = scan.nextLine();
+                }
+                itemToUpdate.setName(newname);
                 break;
             case 2:
                 System.out.print("Enter new description: ");
@@ -265,6 +290,7 @@ public class InventoryManagement {
             default:
                 System.out.println("Invalid option.");
                 return;
+
         }
 
         saveUpdatedData(); // save all data after update
