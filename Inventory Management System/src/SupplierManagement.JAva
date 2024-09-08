@@ -68,33 +68,28 @@ public class SupplierManagement {
     private static void addSupplier() {
         readSuppliersFromFile();
 
-    // Provide options to add a new supplier or select an existing one
     System.out.println("Select an option:");
     System.out.println("1. Add New Supplier");
     System.out.println("2. Select Previous Supplier");
     System.out.print("Enter your choice (1 or 2): ");
     int option = getValidInteger(1, 2);
-
     if (option == 1) {
-        // Add New Supplier
+        //Add New Supplier
         System.out.print("Enter Supplier Name: ");
         String supplierName = scan.nextLine();
         
-        // Check whether the name already exists
+        //Check whether the name already exists
         if (isSupplierExists(supplierName)) {
             System.out.println("Error: Supplier \"" + supplierName + "\" already exists.");
-            return;  // Exit if the supplier already exists
+            return;
         }
-
         System.out.print("Enter Supplier Contact: ");
         String supplierContact = scan.nextLine();
         System.out.print("Enter Supplier Address: ");
         String supplierAddress = scan.nextLine();
-
         Supplier newSupplier = new Supplier(supplierName, supplierContact, supplierAddress);
         suppliers.add(newSupplier);
         saveSupplierToFile(newSupplier);
-
         System.out.println("New Supplier \"" + supplierName + "\" added successfully.");
     } else if (option == 2) {
         // Select Previous Supplier
@@ -269,6 +264,7 @@ public class SupplierManagement {
         }
     }
 
+    //Display all the supplier information
     private static void displayAllSupplierAndPerformancel(){
         
         
@@ -301,7 +297,7 @@ public class SupplierManagement {
         }
     }
     
-    // Method to delete supplier's performance data from file
+    //Delete suppliers performance data
     private static void deleteSupplierPerformance(String supplierName) {
         List<SupplierPerformance> performances = readPerformancesFromFile();
         
