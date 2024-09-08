@@ -93,6 +93,7 @@ public class InventorySystem {
                         System.out.println("Accessing Supplier Management...");
                         sleepUtil.sleep(2000);
                         SupplierManagement.showSupMenu();
+                        
 
                     } else {
                         System.out.println(ColorUtil.RED_BOLD
