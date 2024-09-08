@@ -1,1 +1,1 @@
-testsupply,10,55,23
+leeweiquan,50,50,50
