@@ -64,7 +64,7 @@ public class SupplierManagement {
         }
     }
 
-    //Add Supplier/Use previous Supplier
+    //Add Supplier
     private static void addSupplier() {
         System.out.println("Add Supplier...");
         System.out.print("Enter supplier name: ");
@@ -85,92 +85,165 @@ public class SupplierManagement {
         }
     }
 
-    private static void updateSupplierInformation() {
-    System.out.print("Enter the name of the supplier you want to update: ");
-    String supplierName = scan.nextLine();
 
-    for (Supplier supplier : suppliers) {
+    private static void updateSupplierInformation() {
+        System.out.print("Enter the name of the supplier you want to update: ");
+    String supplierName = scan.nextLine();
+    boolean found = false;
+    List<Supplier> supplierList = new ArrayList<>();
+    try (Scanner fileScanner = new Scanner(new File("suppliers.txt"))) {
+        while (fileScanner.hasNextLine()) {
+            String line = fileScanner.nextLine();
+            String[] details = line.replace("Supplier [", "").replace("]", "").split(", ");
+            
+            String name = details[0].split("=")[1];
+            String contact = details[1].split("=")[1];
+            String address = details[2].split("=")[1];
+
+            Supplier supplier = new Supplier(name, contact, address);
+            supplierList.add(supplier);
+        }
+    } catch (FileNotFoundException e) {
+        System.out.println("Supplier file not found.");
+        e.printStackTrace();
+        return;
+    }
+
+    // Search for the supplier to update
+    for (Supplier supplier : supplierList) {
         if (supplier.getName().equalsIgnoreCase(supplierName)) {
-            System.out.println("Current Supplier Details: " + supplier.toString());
-            System.out.print("Enter new Supplier Contact (or press Enter to keep current): ");
+            System.out.println("Supplier found: " + supplier);
+            System.out.print("Enter new name (leave blank to keep current): ");
+            String newName = scan.nextLine();
+            if (!newName.trim().isEmpty()) {
+                supplier.setName(newName);
+            }
+
+            System.out.print("Enter new contact (leave blank to keep current): ");
             String newContact = scan.nextLine();
             if (!newContact.trim().isEmpty()) {
                 supplier.setContact(newContact);
             }
-            System.out.print("Enter new Supplier Address (or press Enter to keep current): ");
+
+            System.out.print("Enter new address (leave blank to keep current): ");
             String newAddress = scan.nextLine();
             if (!newAddress.trim().isEmpty()) {
                 supplier.setAddress(newAddress);
             }
-            saveAllSuppliersToFile();
-            System.out.println("Supplier information updated successfully.");
-            return;
+            found = true;
+            break;
         }
     }
-    System.out.println("Supplier not found.");
+    if (!found) {
+        System.out.println("Supplier not found.");
+        return;
+    }
+    try (FileWriter writer = new FileWriter("suppliers.txt")) {
+        for (Supplier supplier : supplierList) {
+            writer.write(supplier.toString() + System.lineSeparator());
+        }
+        System.out.println("Supplier information updated successfully!");
+    } catch (IOException e) {
+        System.out.println("An error occurred while writing to the file.");
+        e.printStackTrace();
+    }
     }
 
-    //Make sure all changes are recorded
-    private static void saveAllSuppliersToFile() {
-        try (FileWriter writer = new FileWriter("suppliers.txt")) {
-            for (Supplier supplier : suppliers) {
-                writer.write(supplier.getName() + "," + supplier.getContact() + "," + supplier.getAddress() + "\n");
-            }
-        } catch (IOException e) {
-            System.out.println("An error occurred while saving suppliers to the file.");
-            e.printStackTrace();
-        }
-    }
     
     //Track the supplier performance
     private static void trackSupplierPerformance() {
-        List<SupplierPerformance> performances = readPerformancesFromFile();
-            if (performances.isEmpty()) {
-                System.out.println("No performance data available.");
-                return;
-            }
-    
-            System.out.println("Supplier Performance:");
-            for (SupplierPerformance performance : performances) {
-                System.out.println("Supplier: " + performance.getSupplierName());
-                System.out.println("Overall Performance Score: " + performance.getOverallPerformanceScore() + "/100");
-                System.out.println("-------------------------------");
+        System.out.print("Enter the name of the supplier you want to track: ");
+    String supplierName = scan.nextLine();
+    boolean found = false;
+
+    try (Scanner fileScanner = new Scanner(new File("suppliers.txt"))) {
+        while (fileScanner.hasNextLine()) {
+            String line = fileScanner.nextLine();
+            String[] details = line.replace("Supplier [", "").replace("]", "").split(", ");
+
+            String name = details[0].split("=")[1];
+            String contact = details[1].split("=")[1];
+            String address = details[2].split("=")[1];
+            int rating = Integer.parseInt(details[3].split("=")[1]);
+            int deliveries = Integer.parseInt(details[4].split("=")[1]);
+
+            Supplier supplier = new Supplier(name, contact, address);
+            supplier.setRating(rating);
+            supplier.setDeliveries(deliveries);
+
+            if (supplier.getName().equalsIgnoreCase(supplierName)) {
+                found = true;
+                System.out.println("Supplier performance: ");
+                System.out.println(supplier);
+                break;
             }
         }
-    
-        private static List<SupplierPerformance> readPerformancesFromFile() {
-            List<SupplierPerformance> performances = new ArrayList<>();
-            try (Scanner fileScanner = new Scanner(new File("supplier_performance.txt"))) {
-                while (fileScanner.hasNextLine()) {
-                    String line = fileScanner.nextLine();
-                    String[] parts = line.split(",");
-                    if (parts.length == 4) {
-                        performances.add(new SupplierPerformance(parts[0], Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), Integer.parseInt(parts[3])));
-                    }
-                }
-            } catch (FileNotFoundException e) {
-                System.out.println("Performance file not found.");
-            }
-            return performances;
+    } catch (FileNotFoundException e) {
+        System.out.println("Supplier file not found.");
+        e.printStackTrace();
+    }
+
+    if (!found) {
+        System.out.println("Supplier not found.");
+    }
+        
     }
 
     //Adding the supplier performance
     private static void addSupplierPerformance() {
-        System.out.println("Add Supplier Performance...");
-        System.out.print("Enter supplier name: ");
-        String name = scan.nextLine();
-        System.out.print("Enter on-time delivery rate (%): ");
-        int onTimeRate = getValidInteger(0, 100);
-        System.out.print("Enter quality score (1-100): ");
-        int qualityScore = getValidInteger(1, 100);
-        System.out.print("Enter price competitiveness score (1-100): ");
-        int priceCompetitiveness = getValidInteger(1, 100);
-
-        SupplierPerformance performance = new SupplierPerformance(name, onTimeRate, qualityScore, priceCompetitiveness);
-
-        try (FileWriter writer = new FileWriter("supplier_performance.txt", true)) {
-            writer.write(performance.toString() + System.lineSeparator());
-            System.out.println("Supplier performance data added successfully!");
+        System.out.print("Enter the name of the supplier to update performance: ");
+        String supplierName = scan.nextLine();
+        boolean found = false;
+        List<Supplier> supplierList = new ArrayList<>();
+    
+        try (Scanner fileScanner = new Scanner(new File("suppliers.txt"))) {
+            while (fileScanner.hasNextLine()) {
+                String line = fileScanner.nextLine();
+                String[] details = line.replace("Supplier [", "").replace("]", "").split(", ");
+    
+                String name = details[0].split("=")[1];
+                String contact = details[1].split("=")[1];
+                String address = details[2].split("=")[1];
+                int rating = Integer.parseInt(details[3].split("=")[1]);
+                int deliveries = Integer.parseInt(details[4].split("=")[1]);
+    
+                Supplier supplier = new Supplier(name, contact, address);
+                supplier.setRating(rating);
+                supplier.setDeliveries(deliveries);
+                supplierList.add(supplier);
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Supplier file not found.");
+            e.printStackTrace();
+            return;
+        }
+    
+        for (Supplier supplier : supplierList) {
+            if (supplier.getName().equalsIgnoreCase(supplierName)) {
+                System.out.print("Enter new rating (current: " + supplier.getRating() + "): ");
+                int newRating = scan.nextInt();
+                System.out.print("Enter new deliveries count (current: " + supplier.getDeliveries() + "): ");
+                int newDeliveries = scan.nextInt();
+                scan.nextLine();
+    
+                supplier.setRating(newRating);
+                supplier.setDeliveries(newDeliveries);
+    
+                found = true;
+                break;
+            }
+        }
+    
+        if (!found) {
+            System.out.println("Supplier not found.");
+            return;
+        }
+    
+        try (FileWriter writer = new FileWriter("suppliers.txt")) {
+            for (Supplier supplier : supplierList) {
+                writer.write(supplier.toString() + System.lineSeparator());
+            }
+            System.out.println("Supplier performance updated successfully!");
         } catch (IOException e) {
             System.out.println("An error occurred while writing to the file.");
             e.printStackTrace();
@@ -179,138 +252,154 @@ public class SupplierManagement {
 
     //Display all the supplier information
     private static void displayAllSupplierAndPerformancel(){
-        
-        
+        List<Supplier> supplierList = new ArrayList<>();
+
+    // Read suppliers from the file
+    try (Scanner fileScanner = new Scanner(new File("suppliers.txt"))) {
+        while (fileScanner.hasNextLine()) {
+            String line = fileScanner.nextLine();
+            String[] details = line.replace("Supplier [", "").replace("]", "").split(", ");
+
+            String name = details[0].split("=")[1];
+            String contact = details[1].split("=")[1];
+            String address = details[2].split("=")[1];
+            int rating = Integer.parseInt(details[3].split("=")[1]);
+            int deliveries = Integer.parseInt(details[4].split("=")[1]);
+
+            // Add each supplier to the list
+            Supplier supplier = new Supplier(name, contact, address);
+            supplier.setRating(rating);
+            supplier.setDeliveries(deliveries);
+            supplierList.add(supplier);
+        }
+    } catch (FileNotFoundException e) {
+        System.out.println("Supplier file not found.");
+        e.printStackTrace();
+        return;
+    }
+
+    // Display all suppliers
+    System.out.println("All Suppliers and Performance:");
+    System.out.println("=============================");
+    for (Supplier supplier : supplierList) {
+        System.out.println(supplier); // Supplier's toString method will format the output
+    }
     }
 
     //Delete Supplier
-    private static void deleteSupplier() {
-        System.out.print("Enter the name of the supplier to delete: ");
-        String supplierName = scan.nextLine();
-        
-        Supplier supplierToDelete = null;
-        for (Supplier supplier : suppliers) {
-            if (supplier.getName().equalsIgnoreCase(supplierName)) {
-                supplierToDelete = supplier;
-                break;
+    private static void deleteSupplier() { System.out.print("Enter the name of the supplier to delete: ");
+    String supplierName = scan.nextLine();
+    boolean found = false;
+    List<Supplier> supplierList = new ArrayList<>();
+
+    // Read suppliers from the file
+    try (Scanner fileScanner = new Scanner(new File("suppliers.txt"))) {
+        while (fileScanner.hasNextLine()) {
+            String line = fileScanner.nextLine();
+            String[] details = line.replace("Supplier [", "").replace("]", "").split(", ");
+
+            String name = details[0].split("=")[1];
+            String contact = details[1].split("=")[1];
+            String address = details[2].split("=")[1];
+            int rating = Integer.parseInt(details[3].split("=")[1]);
+            int deliveries = Integer.parseInt(details[4].split("=")[1]);
+
+            Supplier supplier = new Supplier(name, contact, address);
+            supplier.setRating(rating);
+            supplier.setDeliveries(deliveries);
+
+            // Only add suppliers that are NOT being deleted
+            if (!name.equalsIgnoreCase(supplierName)) {
+                supplierList.add(supplier);
+            } else {
+                found = true;
             }
         }
-        
-        if (supplierToDelete != null) {
-            // Remove supplier from the list
-            suppliers.remove(supplierToDelete);
-            saveAllSuppliersToFile();            
-            // Remove supplier's performance data
-            deleteSupplierPerformance(supplierName);
-            
-            System.out.println("Supplier and associated performance data deleted successfully.");
-        } else {
-            System.out.println("Supplier not found.");
-        }
+    } catch (FileNotFoundException e) {
+        System.out.println("Supplier file not found.");
+        e.printStackTrace();
+        return;
     }
-    
-    //Delete suppliers performance data
-    private static void deleteSupplierPerformance(String supplierName) {
-        List<SupplierPerformance> performances = readPerformancesFromFile();
-        
-        // Filter out the performance data for the supplier to be deleted
-        performances.removeIf(performance -> performance.getSupplierName().equalsIgnoreCase(supplierName));
-        
-        // Save the updated performance list back to the file
-        try (FileWriter writer = new FileWriter("supplier_performance.txt")) {
-            for (SupplierPerformance performance : performances) {
-                writer.write(performance.toString() + System.lineSeparator());
-            }
-        } catch (IOException e) {
-            System.out.println("An error occurred while saving updated performance data.");
-            e.printStackTrace();
+
+    // Check if the supplier was found
+    if (!found) {
+        System.out.println("Supplier not found.");
+        return;
+    }
+
+    // Write the updated list of suppliers back to the file
+    try (FileWriter writer = new FileWriter("suppliers.txt")) {
+        for (Supplier supplier : supplierList) {
+            writer.write(supplier.toString() + System.lineSeparator());
         }
+        System.out.println("Supplier deleted successfully!");
+    } catch (IOException e) {
+        System.out.println("An error occurred while writing to the file.");
+        e.printStackTrace();
+    }
     }
 
 //Supplier Class
     public static class Supplier {
         private String name;
-        private String contact;
-        private String address;
+    private String contact;
+    private String address;
+    private int rating; //Rating out of 10 or percentage
+    private int deliveries; //Number of successful deliveries
 
-
-        public Supplier(String name, String contact, String address) {
-            this.name = name;
-            this.contact = contact;
-            this.address = address;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getContact() {
-            return contact;
-        }
-
-        public void setContact(String contact) {
-            this.contact = contact;
-        }
-
-        public String getAddress() {
-            return address;
-        }
-
-        public void setAddress(String address) {
-            this.address = address;
-        }
-
-        @Override
-        public String toString() {
-            return "Supplier [Name=" + name + ", Contact=" + contact + ", Address=" + address + "]";
-        }
+    public Supplier(String name, String contact, String address) {
+        this.name = name;
+        this.contact = contact;
+        this.address = address;
+        this.rating = 0;
+        this.deliveries = 0;
     }
 
-//The Supplier Performance rate
-    public static class SupplierPerformance {
-        private String supplierName;
-        private int onTimeDeliveryRate;         // in %
-        private int qualityScore;              // 1-100
-        private int priceCompetitiveness;     // 1-100
-
-        public SupplierPerformance(String supplierName, int onTimeDeliveryRate, int qualityScore, int priceCompetitiveness) {
-            this.supplierName = supplierName;
-            this.onTimeDeliveryRate = onTimeDeliveryRate;
-            this.qualityScore = qualityScore;
-            this.priceCompetitiveness = priceCompetitiveness;
-        }
-
-        public String getSupplierName() {
-            return supplierName;
-        }
-
-        public int getOverallPerformanceScore() {
-            // Weighted score example: 50% on-time, 30% quality, 20% price
-            return (int) ((onTimeDeliveryRate * 0.5) + (qualityScore * 0.3) + (priceCompetitiveness * 0.2));
-        }
-
-        @Override
-        public String toString() {
-            return supplierName + "," + onTimeDeliveryRate + "," + qualityScore + "," + priceCompetitiveness;
-        }
+    public String getName() {
+        return name;
     }
-    private static int getValidInteger(int min, int max) {
-        while (true) {
-            try {
-                int value = Integer.parseInt(scan.nextLine());
-                if (value >= min && value <= max) {
-                    return value;
-                } else {
-                    System.out.println("Please enter a number between " + min + " and " + max + ".");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a valid integer.");
-            }
-        }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getContact() {
+        return contact;
+    }
+
+    public void setContact(String contact) {
+        this.contact = contact;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
+
+    public int getDeliveries() {
+        return deliveries;
+    }
+
+    public void setDeliveries(int deliveries) {
+        this.deliveries = deliveries;
+    }
+
+    @Override
+    public String toString() {
+        return "Supplier [Name=" + name + ", Contact=" + contact + ", Address=" + address + 
+               ", Rating=" + rating + ", Deliveries=" + deliveries + "]";
+    }
     }
 
     
