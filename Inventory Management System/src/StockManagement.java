@@ -10,6 +10,10 @@ import java.util.Scanner;
 public class StockManagement {
     private static Scanner scan = new Scanner(System.in);
     private static List<Stock> stockList = new ArrayList<>();
+    
+    public static void main(String[] args) {
+        showStockMenu();
+    }
 
     public static void showStockMenu() {
         while (true) {
@@ -132,36 +136,83 @@ public class StockManagement {
         }
 
         System.out.println("=====================================================================");
+        scan.nextLine();
     }
 
     public static void addStock() {
         System.out.println("Add New Stock");
         System.out.println("==============");
 
-        // Collect stock details from user
-        System.out.print("Enter Item ID: ");
-        String itemID = scan.nextLine();
+        String itemID = generateNewItemID();
+        System.out.println("Generated Item ID: " + itemID);
 
-        // Check if an item with the same ID already exists
-        for (Stock stock : stockList) {
-            if (stock.getItemID().equals(itemID)) {
-                System.out.println("An item with ID " + itemID + " already exists. Please enter a unique Item ID.");
-                sleepUtil.sleep(2000);
-                return; // Exit the method without adding the stock
+        String itemName = "";
+        while (true) {
+            System.out.print("Enter Item Name: ");
+            itemName = scan.nextLine();
+            if (itemName.matches("[a-zA-Z\\s]+")) {
+                break;
+            } else {
+                System.out.println("Invalid item name. Please enter alphabetic characters only.");
             }
         }
 
-        System.out.print("Enter Item Name: ");
-        String itemName = scan.nextLine();
-        System.out.print("Enter Quantity: ");
-        int quantity = scan.nextInt();
-        System.out.print("Enter Unit Price: ");
-        double unitPrice = scan.nextDouble();
+        int quantity = 0;
+        while(true){ 
+            System.out.print("Enter Quantity: ");
+            String input = scan.next();
+            try {
+                quantity = Integer.parseInt(input);
+                if(quantity < 0){
+                    throw new Exception("Quantity less than 0");
+                }
+                break;
+            } catch (Exception ex) {
+                System.out.println("Invalid quantity. Please enter a valid quantity.");
+            }
+        }
+        
+        double unitPrice = 0.0;
+        while(true){
+            System.out.print("Enter Unit Price: ");
+            String input = scan.next();
+            try {
+                unitPrice = Double.parseDouble(input);
+                if(unitPrice < 0){
+                    throw new Exception("Quantity less than 0");
+                }
+                break;
+            } catch (Exception ex) {
+                System.out.println("Invalid price. Please enter a valid price.");
+            }
+        }
         scan.nextLine(); // Consume newline
-        System.out.print("Enter Category: ");
-        String category = scan.nextLine();
-        System.out.print("Enter Max Quantity: ");
-        int maxQuantity = scan.nextInt();
+
+        String category;
+        while (true) { 
+            System.out.print("Enter Category: ");
+            category = scan.nextLine();
+            if (category.matches("[a-zA-Z\\s]+")) {
+                break;
+            } else {
+                System.out.println("Invalid category name. Please enter alphabetic characters only.");
+            }
+        }
+        
+        int maxQuantity = 0;
+        while(true){ 
+            System.out.print("Enter Quantity: ");
+            String input = scan.next();
+            try {
+                maxQuantity = Integer.parseInt(input);
+                if(maxQuantity < 0){
+                    throw new Exception("Quantity less than 0");
+                }
+                break;
+            } catch (Exception ex) {
+                System.out.println("Invalid max quantity. Please enter a valid quantity.");
+            }
+        }
 
         // Create a new Stock object
         Stock newStock = new Stock(itemID, itemName, quantity, unitPrice, category, maxQuantity);
@@ -196,39 +247,97 @@ public class StockManagement {
             }
         }
 
+        String itemName = "";
         if (stockToUpdate != null) {
-            System.out.println("Updating Stock Details for Item ID: " + itemID);
+            System.out.println("Updating Stock Details for Item ID: " + itemID);            
+            while (true) {
+                System.out.print("Enter new Item Name (leave blank to keep current): ");
+                itemName = scan.nextLine();
+                if (!itemName.isEmpty()) {
+                    if (itemName.matches("[a-zA-Z\\s]+")) {
+                        stockToUpdate.setItemName(itemName);
+                        break;
+                    } else {
+                        System.out.println("Invalid item name. Please enter alphabetic characters only.");
+                    }
+                }
+                else {
+                    break;
+                }                
+            }
+
+            int quantity = 0;
+            while(true){ 
+                System.out.print("Enter new Quantity (enter -1 to keep current): ");
+                String input = scan.next();
+                    try {
+                        quantity = Integer.parseInt(input);
+                        if(quantity == -1) break;
+                        if(quantity < 0){
+                            throw new Exception("Quantity less than 0");
+                        }
+                        stockToUpdate.setQuantity(quantity);
+                        break;
+                    } catch (Exception ex) {
+                        System.out.println("Invalid quantity. Please enter a valid quantity.");
+                    }
+                
+            }
+    
+
+            double unitPrice = 0.0;
+            while(true){
+                System.out.print("Enter new Unit Price (enter -1 to keep current): ");
+                String input = scan.next();
+                try {
+                    unitPrice = Double.parseDouble(input);
+                    if(unitPrice == -1) break;
+                    if(unitPrice < 0){
+                        throw new Exception("Quantity less than 0");
+                    }
+                    stockToUpdate.setUnitPrice(unitPrice);
+                    break;
+                    } catch (Exception ex) {
+                        System.out.println("Invalid price. Please enter a valid price.");
+                    }
+	        }
             
-            System.out.print("Enter new Item Name (leave blank to keep current): ");
-            String itemName = scan.nextLine();
-            if (!itemName.isEmpty()) {
-                stockToUpdate.setItemName(itemName);
-            }
 
-            System.out.print("Enter new Quantity (enter -1 to keep current): ");
-            int quantity = scan.nextInt();
-            if (quantity != -1) {
-                stockToUpdate.setQuantity(quantity);
-            }
-
-            System.out.print("Enter new Unit Price (enter -1 to keep current): ");
-            double unitPrice = scan.nextDouble();
-            if (unitPrice != -1) {
-                stockToUpdate.setUnitPrice(unitPrice);
-            }
             scan.nextLine(); // Consume newline
-
-            System.out.print("Enter new Category (leave blank to keep current): ");
-            String category = scan.nextLine();
-            if (!category.isEmpty()) {
-                stockToUpdate.setCategory(category);
+            String category;
+            while (true) { 
+                System.out.print("Enter Category: ");
+                category = scan.nextLine();
+                if (!category.isEmpty()) {
+                    if (category.matches("[a-zA-Z\\s]+")) {
+                        stockToUpdate.setCategory(category);
+                        break;
+                    } else {
+                        System.out.println("Invalid category name. Please enter alphabetic characters only.");
+                    }
+                }
+                else {
+                    break;
+                }  
             }
 
-            System.out.print("Enter new Max Quantity (enter -1 to keep current): ");
-            int maxQuantity = scan.nextInt();
-            if (maxQuantity != -1) {
-                stockToUpdate.setMaxQuantity(maxQuantity);
-            }
+            int maxQuantity = 0;
+            while(true){ 
+                System.out.print("Enter Max Quantity: ");
+                String input = scan.next();
+                try {
+                    maxQuantity = Integer.parseInt(input);
+                    if(maxQuantity == -1) break;
+                    if(maxQuantity < 0){
+                        throw new Exception("Quantity less than 0");
+                    }
+                    stockToUpdate.setMaxQuantity(maxQuantity);
+                    break;
+                } catch (Exception ex) {
+                    System.out.println("Invalid max quantity. Please enter a valid quantity.");
+                }
+            } 
+            
 
             // Save updates to file
             try (BufferedWriter writer = new BufferedWriter(new FileWriter("stock.txt"))) {
@@ -240,7 +349,6 @@ public class StockManagement {
             } catch (IOException e) {
                 System.out.println("An error occurred while saving the stock: " + e.getMessage());
             }
-
         } else {
             System.out.println("Stock item with ID " + itemID + " not found.");
         }
@@ -282,6 +390,29 @@ public class StockManagement {
         sleepUtil.sleep(2000);
     }
     
+    public static String generateNewItemID() {
+        int highestNumber = 0;
+        
+        // Check the existing item IDs to find the highest number
+        for (Stock stock : stockList) {
+            String currentID = stock.getItemID();
+            if (currentID.startsWith("A")) {
+                try {
+                    int number = Integer.parseInt(currentID.substring(1));
+                    if (number > highestNumber) {
+                        highestNumber = number;
+                    }
+                } catch (NumberFormatException e) {
+                    // Handle the case where the ID is not properly formatted (e.g., not starting with 'A' or non-numeric)
+                }
+            }
+        }
+    
+        // Generate the new ID by incrementing the highest found number
+        int newNumber = highestNumber + 1;
+        return String.format("A%03d", newNumber); // Format the number with leading zeros (e.g., A001, A002)
+    }
+
     public static class Stock {
         private String itemID;
         private String itemName;
