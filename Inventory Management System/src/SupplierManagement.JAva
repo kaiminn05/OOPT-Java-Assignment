@@ -233,12 +233,10 @@ public class SupplierManagement {
                 break;
             }
         }
-    
         if (!found) {
             System.out.println("Supplier not found.");
             return;
         }
-    
         try (FileWriter writer = new FileWriter("suppliers.txt")) {
             for (Supplier supplier : supplierList) {
                 writer.write(supplier.toString() + System.lineSeparator());
@@ -259,13 +257,11 @@ public class SupplierManagement {
         while (fileScanner.hasNextLine()) {
             String line = fileScanner.nextLine();
             String[] details = line.replace("Supplier [", "").replace("]", "").split(", ");
-
             String name = details[0].split("=")[1];
             String contact = details[1].split("=")[1];
             String address = details[2].split("=")[1];
             int rating = Integer.parseInt(details[3].split("=")[1]);
             int deliveries = Integer.parseInt(details[4].split("=")[1]);
-
             // Add each supplier to the list
             Supplier supplier = new Supplier(name, contact, address);
             supplier.setRating(rating);
@@ -291,8 +287,6 @@ public class SupplierManagement {
     String supplierName = scan.nextLine();
     boolean found = false;
     List<Supplier> supplierList = new ArrayList<>();
-
-    // Read suppliers from the file
     try (Scanner fileScanner = new Scanner(new File("suppliers.txt"))) {
         while (fileScanner.hasNextLine()) {
             String line = fileScanner.nextLine();
@@ -320,13 +314,11 @@ public class SupplierManagement {
         e.printStackTrace();
         return;
     }
-
     // Check if the supplier was found
     if (!found) {
         System.out.println("Supplier not found.");
         return;
     }
-
     // Write the updated list of suppliers back to the file
     try (FileWriter writer = new FileWriter("suppliers.txt")) {
         for (Supplier supplier : supplierList) {
