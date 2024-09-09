@@ -66,113 +66,26 @@ public class SupplierManagement {
 
     //Add Supplier/Use previous Supplier
     private static void addSupplier() {
-        readSuppliersFromFile();
+        System.out.println("Add Supplier...");
+        System.out.print("Enter supplier name: ");
+        String name = scan.nextLine();
+        System.out.print("Enter supplier address: ");
+        String address = scan.nextLine();
+        System.out.print("Enter supplier contact number: ");
+        String contactNum = scan.nextLine();
 
-    System.out.println("Select an option:");
-    System.out.println("1. Add New Supplier");
-    System.out.println("2. Select Previous Supplier");
-    System.out.print("Enter your choice (1 or 2): ");
-    int option = getValidInteger(1, 2);
-    if (option == 1) {
-        //Add New Supplier
-        System.out.print("Enter Supplier Name: ");
-        String supplierName = scan.nextLine();
-        
-        //Check whether the name already exists
-        if (isSupplierExists(supplierName)) {
-            System.out.println("Error: Supplier \"" + supplierName + "\" already exists.");
-            return;
-        }
-        System.out.print("Enter Supplier Contact: ");
-        String supplierContact = scan.nextLine();
-        System.out.print("Enter Supplier Address: ");
-        String supplierAddress = scan.nextLine();
-        Supplier newSupplier = new Supplier(supplierName, supplierContact, supplierAddress);
-        suppliers.add(newSupplier);
-        saveSupplierToFile(newSupplier);
-        System.out.println("New Supplier \"" + supplierName + "\" added successfully.");
-    } else if (option == 2) {
-        // Select Previous Supplier
-        displayAllSuppliers();
+        Supplier supplier = new Supplier(name, address, contactNum);
 
-        System.out.print("Enter the name of the supplier to select: ");
-        String supplierName = scan.nextLine();
-
-        if (isSupplierExists(supplierName)) {
-            readSupplierDetails(supplierName);
-        } else {
-            System.out.println("Supplier not found.");
-        }
-    }
-}
-
-//Find the previous supplier
-    private static void displayAllSuppliers() {
-        if (suppliers.isEmpty()) {
-            System.out.println("No suppliers available.");
-            return;
-        }    
-        System.out.println("Available Suppliers:");
-        for (Supplier supplier : suppliers) {
-            System.out.println(supplier.getName());
-        }
-    }
-
-    private static void readSuppliersFromFile() {
-        File file = new File("suppliers.txt");
-        if (!file.exists()) {
-            return;
-        }
-        try (Scanner fileScanner = new Scanner(file)) {
-            while (fileScanner.hasNextLine()) {
-                String line = fileScanner.nextLine();
-                if (!line.trim().isEmpty()) {
-                    String[] details = line.split(",");
-                    if (details.length == 3) {
-                        Supplier supplier = new Supplier(details[0], details[1], details[2]);
-                        suppliers.add(supplier);
-                    }
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("An error occurred while reading suppliers from the file.");
-            e.printStackTrace();
-        }
-    }
-
-    //Do validation
-    private static boolean isSupplierExists(String supplierName) {
-        for (Supplier supplier : suppliers) {
-            if (supplier.getName().equalsIgnoreCase(supplierName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static void readSupplierDetails(String supplierName) {
-        for (Supplier supplier : suppliers) {
-            if (supplier.getName().equalsIgnoreCase(supplierName)) {
-                System.out.println("Supplier Details: " + supplier.toString());
-                return;
-            }
-        }
-        System.out.println("Supplier not found.");
-    }
-
-    private static void saveSupplierToFile(Supplier supplier) {
         try (FileWriter writer = new FileWriter("suppliers.txt", true)) {
-            writer.write(supplier.getName() + "," + supplier.getContact() + "," + supplier.getAddress() + "\n");
+            writer.write(supplier.toString() + System.lineSeparator());
+            System.out.println("Supplier added successfully!");
         } catch (IOException e) {
-            System.out.println("An error occurred while saving the supplier to the file.");
+            System.out.println("An error occurred while writing to the file.");
             e.printStackTrace();
         }
     }
-
 
     private static void updateSupplierInformation() {
-        readSuppliersFromFile();
-
     System.out.print("Enter the name of the supplier you want to update: ");
     String supplierName = scan.nextLine();
 
@@ -286,8 +199,7 @@ public class SupplierManagement {
         if (supplierToDelete != null) {
             // Remove supplier from the list
             suppliers.remove(supplierToDelete);
-            saveAllSuppliersToFile();
-            
+            saveAllSuppliersToFile();            
             // Remove supplier's performance data
             deleteSupplierPerformance(supplierName);
             
@@ -400,4 +312,6 @@ public class SupplierManagement {
             }
         }
     }
+
+    
 }
