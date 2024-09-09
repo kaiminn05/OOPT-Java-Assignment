@@ -1,3 +1,1 @@
-Supplier [Name=Ali, Contact=Pv13, Address=12345556, Rating=0, Deliveries=0]
-Supplier [Name=Alvin, Contact=Pv12, Address=12344412, Rating=0, Deliveries=0]
-Supplier [Name=Muthu, Contact=Pv210, Address=1023492000, Rating=0, Deliveries=0]
+leeweiquan,0178816824,Pv15
