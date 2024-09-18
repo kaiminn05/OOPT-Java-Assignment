@@ -25,8 +25,7 @@ public class StockManagement {
             System.out.println("3. Add New Stock");
             System.out.println("4. Update Stock Levels");
             System.out.println("5. Delete Stock");
-            System.out.println("6. Track Batch Number");
-            System.out.print("7. Exit >");
+            System.out.print("6. Exit >");
             int choice = scan.nextInt();
             scan.nextLine();
 
@@ -53,10 +52,6 @@ public class StockManagement {
                     deleteStock();
                     break;
                 case 6:
-                    System.out.println("Tracking...");
-                    sleepUtil.sleep(2000);
-                    break;
-                case 7:
                     return;
                 default:
                     System.out.println("Invalid Choice. Please Try Again");
