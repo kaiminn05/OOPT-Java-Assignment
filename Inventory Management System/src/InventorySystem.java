@@ -15,6 +15,7 @@ public class InventorySystem {
     }
 
     public static void showLoginMenu() {
+        SupplierManagement.loadSupplier();//load the supplier 
         InventoryManagement.loadItemsData();
         ClearScreenUtil.clearScreen();
         System.out.println("Welcome to F&B Inventory Management System");

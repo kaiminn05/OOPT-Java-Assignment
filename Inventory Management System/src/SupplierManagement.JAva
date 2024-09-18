@@ -1,10 +1,10 @@
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Scanner;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class SupplierManagement {
     private static Scanner scan = new Scanner(System.in);
@@ -330,6 +330,58 @@ public class SupplierManagement {
         e.printStackTrace();
     }
     }
+
+
+
+    public static void loadSupplier() {
+        File inventoryFile = new File("Inventory Management System\\resources\\inventory.txt");
+        File supplierFile = new File("Inventory Management System\\resources\\supplier.txt");
+    
+        if (!inventoryFile.exists()) {
+            System.out.println("File inventory.txt does not exist");
+            return;
+        }
+    
+        // load existing supplier from supplier.txt prevent duplicate
+        List<String> existingSuppliers = new ArrayList<>();
+        if (supplierFile.exists()) {
+            try (Scanner supplierScanner = new Scanner(supplierFile)) {
+                while (supplierScanner.hasNextLine()) {
+                    String line = supplierScanner.nextLine();
+                    String[] columns = line.split(",");
+                    if (columns.length > 0) {
+                        existingSuppliers.add(columns[0]);  //supplier name in first column
+                    }
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    
+        try (Scanner fileScanner = new Scanner(inventoryFile);
+             FileWriter supplierWriter = new FileWriter(supplierFile, true)) { 
+    
+            while (fileScanner.hasNextLine()) {
+                String data = fileScanner.nextLine();
+                String[] columns = data.split(",");  //split the line by ,
+    
+                if (columns.length > 5) {  // ensure atleast 6 col
+                    String supplierName = columns[5];  
+    
+                    // write to file if the supplier is not repeat
+                    if (!existingSuppliers.contains(supplierName)) {
+                        String supplierDetails = supplierName + ",null,null,null,null\n";
+                        supplierWriter.write(supplierDetails);
+                    }
+                }
+            }
+    
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+
 
 //Supplier Class
     public static class Supplier {

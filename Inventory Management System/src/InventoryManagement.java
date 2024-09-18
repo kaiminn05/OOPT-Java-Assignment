@@ -155,8 +155,7 @@ public class InventoryManagement {
             unit = scan.nextLine();
         }
 
-        System.out.print("Enter item supplier: ");
-        String supplier = scan.nextLine();
+        String supplier = chooseOrAddSupplier();
 
         String id = "A" + String.format("%03d", items.size() + 1);// generate unique ID for each items
         int quantity = 0;
@@ -267,11 +266,51 @@ public class InventoryManagement {
                 break;
             case 2:
                 System.out.print("Enter new description: ");
-                itemToUpdate.setDesc(scan.nextLine());
+                String desc = scan.nextLine();
+                while (desc.length() > 20 || desc.isEmpty()) {
+                    if (desc.isEmpty()) {
+                        System.out.println(ColorUtil.RED_BOLD + "New description cannot be empty." + ColorUtil.RESET);
+                        sleepUtil.sleep(2000);
+                        ClearScreenUtil.clearPreviousLine();
+                        ClearScreenUtil.clearPreviousLine();
+                        System.out.print("Enter new description: ");
+                        desc = scan.nextLine();
+                    } else {
+                        System.out.println("The max item description is 20 characters.");
+                        sleepUtil.sleep(2000);
+                        ClearScreenUtil.clearPreviousLine();
+                        ClearScreenUtil.clearPreviousLine();
+                        System.out.print("Enter new description: ");
+                        desc = scan.nextLine();
+                    }
+                }
+                itemToUpdate.setDesc(desc);
                 break;
             case 3:
+                double price;
                 System.out.print("Enter new price: ");
-                itemToUpdate.setPrice(scan.nextDouble());
+                while (true) {
+                    if (scan.hasNextDouble()) {
+                        price = scan.nextDouble();
+                        if (price < 0) {
+                            System.out.println(ColorUtil.RED + "The item price should be positive." + ColorUtil.RESET);
+                            sleepUtil.sleep(1500);
+                            ClearScreenUtil.clearPreviousLine();
+                            ClearScreenUtil.clearPreviousLine();
+                            System.out.print("Enter new price: ");
+                        } else {
+                            break;
+                        }
+                    } else {
+                        System.out
+                                .println(ColorUtil.RED_BOLD + "Invalid input. Please enter a valid number." + ColorUtil.RESET);
+                        sleepUtil.sleep(1500);
+                        ClearScreenUtil.clearPreviousLine();
+                        ClearScreenUtil.clearPreviousLine();
+                        scan.next();
+                        System.out.print("Enter new price: ");
+                    }
+                }
                 scan.nextLine();
                 break;
             case 4:
@@ -368,6 +407,65 @@ public class InventoryManagement {
         scan.nextLine();
     }
 
+    private static String chooseOrAddSupplier() {
+        List<String> suppliers = loadSuppliersFromFile();
+    
+        System.out.println("1. Choose from previous suppliers");
+        System.out.println("2. Add a new supplier");
+    
+        int option;
+        while (true) {
+            System.out.print("Enter your choice (1 or 2): ");
+            if (scan.hasNextInt()) {
+                option = scan.nextInt();
+                scan.nextLine();  
+                if (option == 1 || option == 2) {
+                    break;
+                } else {
+                    System.out.println("Invalid input. Please choose either 1 or 2.");
+                }
+            } else {
+                System.out.println("Invalid input. Please enter a valid number (1 or 2).");
+                scan.next();  
+            }
+        }
+    
+        if (option == 1) {  // choose from previous suppliers
+            if (suppliers.isEmpty()) {
+                System.out.println("No existing suppliers found.");
+            } else {
+                System.out.println("Choose a supplier from the list:");
+                for (int i = 0; i < suppliers.size(); i++) {
+                    System.out.println((i + 1) + ". " + suppliers.get(i));
+                }
+            }
+    
+            int choice;
+            while (true) {
+                System.out.print("Enter your choice: ");
+                if (scan.hasNextInt()) {
+                    choice = scan.nextInt();
+                    scan.nextLine();  
+                    if (choice > 0 && choice <= suppliers.size()) {
+                        return suppliers.get(choice - 1);
+                    } else {
+                        System.out.println("Invalid input. Please choose a valid supplier number.");
+                    }
+                } else {
+                    System.out.println("Invalid input. Please enter a valid number.");
+                    scan.next();  
+                }
+            }
+        } else if (option == 2) {  // option for add new supplier
+            System.out.print("Enter new supplier name: ");
+            String newSupplier = scan.nextLine();
+            appendSupplierToFile(newSupplier);
+            return newSupplier;
+        }
+    
+        return null;  
+    }
+    
     private static void setExpiryDate() {
         ClearScreenUtil.clearScreen();
         System.out.println("SET EXPIRY DATE");
@@ -509,7 +607,7 @@ public class InventoryManagement {
 
             return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
         } catch (ParseException e) {
-            System.out.println("Error parsing date: " + expiryDateStr);
+            
             return -1;
         }
     }
@@ -549,6 +647,33 @@ public class InventoryManagement {
             System.out.println("Error saving item data.");
             e.printStackTrace();
             return false;
+        }
+    }
+
+    private static List<String> loadSuppliersFromFile() {
+        List<String> suppliers = new ArrayList<>();
+        File supplierFile = new File("Inventory Management System\\resources\\supplier.txt");
+        if (supplierFile.exists()) {
+            try (Scanner fileScanner = new Scanner(supplierFile)) {
+                while (fileScanner.hasNextLine()) {
+                    String line = fileScanner.nextLine();
+                    String[] details = line.split(",");
+                    if (details.length > 0) {
+                        suppliers.add(details[0]);  // first col for supplier name
+                    }
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return suppliers;
+    }
+
+    private static void appendSupplierToFile(String supplier) {
+        try (FileWriter writer = new FileWriter("Inventory Management System\\resources\\supplier.txt", true)) {
+            writer.write(supplier + ",null,null,null,null\n"); 
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
