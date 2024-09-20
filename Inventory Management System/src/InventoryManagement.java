@@ -620,7 +620,7 @@ public class InventoryManagement {
     private static boolean saveItemData(Item item) { // this if use for add items with append TRUE so that data wont
                                                      // replace previous data
         try (FileWriter writer = new FileWriter(
-                "Inventory Management System\\resources\\inventory.txt",
+                "Inventory Management System/resources/inventory.txt",
                 true)) { // write in append mode so that exist items
             // wont replace new item
             writer.write(item.getId() + "," + item.getName() + "," + item.getDesc() + "," + item.getPrice() + ","
@@ -636,7 +636,7 @@ public class InventoryManagement {
 
     private static boolean saveUpdatedData() { // this is use for update items information without append TRUE
         try (FileWriter writer = new FileWriter(
-                "Inventory Management System\\resources\\inventory.txt")) {
+                "Inventory Management System/resources/inventory.txt")) {
             for (Item item : items) {
                 writer.write(item.getId() + "," + item.getName() + "," + item.getDesc() + "," + item.getPrice() + ","
                         + item.getUnit() + "," + item.getSupplier() + "," + item.getQty() + "," + item.getExpiryDate()
@@ -652,7 +652,7 @@ public class InventoryManagement {
 
     private static List<String> loadSuppliersFromFile() {
         List<String> suppliers = new ArrayList<>();
-        File supplierFile = new File("Inventory Management System\\resources\\supplier.txt");
+        File supplierFile = new File("Inventory Management System/resources/supplier.txt");
         if (supplierFile.exists()) {
             try (Scanner fileScanner = new Scanner(supplierFile)) {
                 while (fileScanner.hasNextLine()) {
@@ -670,8 +670,8 @@ public class InventoryManagement {
     }
 
     private static void appendSupplierToFile(String supplier) {
-        try (FileWriter writer = new FileWriter("Inventory Management System\\resources\\supplier.txt", true)) {
-            writer.write(supplier + ",null,null,null,null\n"); 
+        try (FileWriter writer = new FileWriter("Inventory Management System/resources/supplier.txt", true)) {
+            writer.write(supplier + ",N/A,N/A,0,0\n"); 
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -680,7 +680,7 @@ public class InventoryManagement {
     public static void loadItemsData() {
         items.clear(); // clear existing list
         File file = new File(
-                "Inventory Management System\\resources\\inventory.txt");
+                "Inventory Management System/resources/inventory.txt");
 
         if (!file.exists()) {
             System.out.println("The file inventory.txt does not exist.");
