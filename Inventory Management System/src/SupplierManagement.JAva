@@ -78,9 +78,9 @@ public class SupplierManagement {
 
         try (FileWriter writer = new FileWriter("suppliers.txt", true)) {
             writer.write(supplier.toString() + System.lineSeparator());
-            System.out.println("Supplier added successfully!");
+            System.out.println(ColorUtil.GREEN_BOLD + "Supplier added successfully!" + ColorUtil.RESET);
         } catch (IOException e) {
-            System.out.println("An error occurred while writing to the file.");
+            System.out.println(ColorUtil.RED_BOLD + "An error occurred while writing to the file." + ColorUtil.RESET);
             e.printStackTrace();
         }
     }
@@ -104,7 +104,7 @@ public class SupplierManagement {
             supplierList.add(supplier);
         }
     } catch (FileNotFoundException e) {
-        System.out.println("Supplier file not found.");
+        System.out.println(ColorUtil.RED_BOLD + "Supplier file not found." + ColorUtil.RESET);
         e.printStackTrace();
         return;
     }
@@ -135,16 +135,16 @@ public class SupplierManagement {
         }
     }
     if (!found) {
-        System.out.println("Supplier not found.");
+        System.out.println(ColorUtil.RED_BOLD + "Supplier not found." + ColorUtil.RESET);
         return;
     }
     try (FileWriter writer = new FileWriter("suppliers.txt")) {
         for (Supplier supplier : supplierList) {
             writer.write(supplier.toString() + System.lineSeparator());
         }
-        System.out.println("Supplier information updated successfully!");
+        System.out.println(ColorUtil.BLUE_BOLD + "Supplier information updated successfully!" + ColorUtil.RESET);
     } catch (IOException e) {
-        System.out.println("An error occurred while writing to the file.");
+        System.out.println(ColorUtil.RED_BOLD + "An error occurred while writing to the file." + ColorUtil.RESET);
         e.printStackTrace();
     }
     }
@@ -179,12 +179,12 @@ public class SupplierManagement {
             }
         }
     } catch (FileNotFoundException e) {
-        System.out.println("Supplier file not found.");
+        System.out.println(ColorUtil.RED_BOLD + "Supplier file not found." + ColorUtil.RESET);
         e.printStackTrace();
     }
 
     if (!found) {
-        System.out.println("Supplier not found.");
+        System.out.println(ColorUtil.RED_BOLD + "Supplier not found." + ColorUtil.RESET);
     }
         
     }
@@ -213,7 +213,7 @@ public class SupplierManagement {
                 supplierList.add(supplier);
             }
         } catch (FileNotFoundException e) {
-            System.out.println("Supplier file not found.");
+            System.out.println(ColorUtil.RED_BOLD + "Supplier file not found." + ColorUtil.RESET);
             e.printStackTrace();
             return;
         }
@@ -234,16 +234,16 @@ public class SupplierManagement {
             }
         }
         if (!found) {
-            System.out.println("Supplier not found.");
+            System.out.println(ColorUtil.RED_BOLD + "Supplier not found." + ColorUtil.RESET);
             return;
         }
         try (FileWriter writer = new FileWriter("suppliers.txt")) {
             for (Supplier supplier : supplierList) {
                 writer.write(supplier.toString() + System.lineSeparator());
             }
-            System.out.println("Supplier performance updated successfully!");
+            System.out.println(ColorUtil.GREEN_BOLD + "Supplier performance updated successfully!" + ColorUtil.RESET);
         } catch (IOException e) {
-            System.out.println("An error occurred while writing to the file.");
+            System.out.println(ColorUtil.RED_BOLD + "An error occurred while writing to the file." + ColorUtil.RESET);
             e.printStackTrace();
         }
     }
@@ -269,7 +269,7 @@ public class SupplierManagement {
             supplierList.add(supplier);
         }
     } catch (FileNotFoundException e) {
-        System.out.println("Supplier file not found.");
+        System.out.println(ColorUtil.RED_BOLD + "Supplier file not found." + ColorUtil.RESET);
         e.printStackTrace();
         return;
     }
@@ -310,13 +310,13 @@ public class SupplierManagement {
             }
         }
     } catch (FileNotFoundException e) {
-        System.out.println("Supplier file not found.");
+        System.out.println(ColorUtil.RED_BOLD + "Supplier file not found." + ColorUtil.RESET);
         e.printStackTrace();
         return;
     }
     // Check if the supplier was found
     if (!found) {
-        System.out.println("Supplier not found.");
+        System.out.println(ColorUtil.RED_BOLD + "Supplier not found." + ColorUtil.RESET);
         return;
     }
     // Write the updated list of suppliers back to the file
@@ -324,9 +324,9 @@ public class SupplierManagement {
         for (Supplier supplier : supplierList) {
             writer.write(supplier.toString() + System.lineSeparator());
         }
-        System.out.println("Supplier deleted successfully!");
+        System.out.println(ColorUtil.GREEN_BOLD + "Supplier deleted successfully!" + ColorUtil.RESET);
     } catch (IOException e) {
-        System.out.println("An error occurred while writing to the file.");
+        System.out.println(ColorUtil.RED_BOLD + "An error occurred while writing to the file." + ColorUtil.RESET);
         e.printStackTrace();
     }
     }
@@ -338,7 +338,7 @@ public class SupplierManagement {
         File supplierFile = new File("Inventory Management System\\resources\\supplier.txt");
     
         if (!inventoryFile.exists()) {
-            System.out.println("File inventory.txt does not exist");
+            System.out.println(ColorUtil.RED_BOLD + "File inventory.txt does not exist" + ColorUtil.RESET);
             return;
         }
     
