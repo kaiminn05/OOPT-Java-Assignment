@@ -239,7 +239,7 @@ public class InventorySystem {
     private static List<User> retrieveUserData() {
         List<User> users = new ArrayList<>();
         try {
-            File read = new File("Inventory Management System\\resources\\user.txt");
+            File read = new File("Inventory Management System/resources/user.txt");
             Scanner retrieve = new Scanner(read);
             while (retrieve.hasNextLine()) {
                 String data = retrieve.nextLine();
@@ -264,7 +264,7 @@ public class InventorySystem {
     }
 
     private static boolean saveUserData(List<User> users) {
-        try (FileWriter writer = new FileWriter("Inventory Management System\\resources\\user.txt")) {
+        try (FileWriter writer = new FileWriter("Inventory Management System/resources/user.txt")) {
             for (User user : users) {
                 writer.write(user.getUsername() + "," + user.getPassword() + "," + user.getAge() + "," + user.getRole()
                         + "\n");
