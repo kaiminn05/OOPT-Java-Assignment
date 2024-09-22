@@ -1,3 +1,0 @@
-A001,Beans,69,10.0,Beans,100
-A002,Molk,10,10.0,Dairy,100
-A003,Soda,10,10.0,Beverage,100

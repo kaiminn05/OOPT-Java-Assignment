@@ -716,7 +716,7 @@ public class InventoryManagement {
         }
     }
 
-    private static class Item {
+    public static class Item {
         private String id;
         private String name;
         private String desc;

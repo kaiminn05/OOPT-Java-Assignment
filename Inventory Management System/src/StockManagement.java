@@ -1,8 +1,11 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -52,7 +55,9 @@ public class StockManagement {
                     deleteStock();
                     break;
                 case 6:
-                    return;
+                    System.out.println("Exiting the program. Goodbye!");
+                    System.exit(0);
+                    break;
                 default:
                     System.out.println("Invalid Choice. Please Try Again");
                     sleepUtil.sleep(2000);
@@ -61,9 +66,13 @@ public class StockManagement {
         }
     }
 
-    public static void loadStockFromFile() { 
-        stockList.clear(); // Clear the existing list
-        try (BufferedReader reader = new BufferedReader(new FileReader("inventory.txt"))) {
+    public static void loadStockFromFile() {
+    stockList.clear(); // Clear the existing list
+
+    // First, try to load the file from the root folder
+    File rootFile = new File("inventory.txt");
+    if (rootFile.exists()) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(rootFile))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
@@ -76,14 +85,50 @@ public class StockManagement {
                     String supplier = parts[5];
                     int quantity = Integer.parseInt(parts[6]);
                     String expiryDate = parts[7]; // Assuming date is in String format for now
-                    
+
                     stockList.add(new Stock(id, name, desc, price, unit, supplier, quantity, expiryDate));
                 }
             }
+            System.out.println("Loaded stock from root directory.");
+            return; // Exit the method if loaded successfully
         } catch (IOException e) {
-            System.out.println("An error occurred while reading the stock file: " + e.getMessage());
+            System.out.println("An error occurred while reading the stock file from root directory: " + e.getMessage());
         }
+    } else {
+        System.out.println("inventory.txt not found in root directory, checking resources...");
     }
+
+    // If not found in root, try to load from the resources folder
+    InputStream fileStream = InventoryManagement.class.getClassLoader().getResourceAsStream("inventory.txt");
+    
+    if (fileStream == null) {
+        System.out.println("File not found in resources.");
+        return;
+    }
+
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(fileStream))) {
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String[] parts = line.split(",");
+            if (parts.length == 8) {
+                String id = parts[0];
+                String name = parts[1];
+                String desc = parts[2];
+                double price = Double.parseDouble(parts[3]);
+                String unit = parts[4];
+                String supplier = parts[5];
+                int quantity = Integer.parseInt(parts[6]);
+                String expiryDate = parts[7]; // Assuming date is in String format for now
+
+                stockList.add(new Stock(id, name, desc, price, unit, supplier, quantity, expiryDate));
+            }
+        }
+        System.out.println("Loaded stock from resources.");
+    } catch (IOException e) {
+        System.out.println("An error occurred while reading the stock file from resources: " + e.getMessage());
+    }
+}
+
 
     public static void displayStockItems() {
         loadStockFromFile();
@@ -101,7 +146,7 @@ public class StockManagement {
                               stock.getPrice(), 
                               stock.getUnit(), 
                               stock.getSupplier(), 
-                              stock.getQuantity(), 
+                              stock.getQty(), 
                               stock.getExpiryDate());
         }
         
@@ -127,7 +172,7 @@ public class StockManagement {
                                   stock.getPrice(), 
                                   stock.getUnit(), 
                                   stock.getSupplier(), 
-                                  stock.getQuantity(), 
+                                  stock.getQty(), 
                                   stock.getExpiryDate());
                 foundLowStock = true;
             }
@@ -249,13 +294,7 @@ public class StockManagement {
         stockList.add(newStock);
     
         // Save to file
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("inventory.txt", true))) {
-            writer.write(newStock.toFileFormat());
-            writer.newLine();
-            System.out.println("Stock added successfully and saved to file.");
-        } catch (IOException e) {
-            System.out.println("An error occurred while saving the stock: " + e.getMessage());
-        }
+        saveStockToFile(newStock);
     
         sleepUtil.sleep(2000);
     }
@@ -355,7 +394,7 @@ public class StockManagement {
                     int quantity = Integer.parseInt(input);
                     if (quantity == -1) break;
                     if (quantity < 0) throw new Exception("Quantity less than 0");
-                    stockToUpdate.setQuantity(quantity);
+                    stockToUpdate.setQty(quantity);
                     break;
                 } catch (Exception ex) {
                     System.out.println("Invalid quantity. Please enter a valid quantity.");
@@ -380,20 +419,10 @@ public class StockManagement {
             }
     
             // Save updates to file
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter("inventory.txt"))) {
-                for (Stock stock : stockList) {
-                    writer.write(stock.toFileFormat());
-                    writer.newLine();
-                }
-                System.out.println("Stock updated successfully and saved to file.");
-            } catch (IOException e) {
-                System.out.println("An error occurred while saving the stock: " + e.getMessage());
-            }
-        } else {
-            System.out.println("Stock item with ID " + id + " not found.");
-        }
+            updateStockToFile();
     
         sleepUtil.sleep(2000);
+        }
     }
     
     public static void deleteStock() {
@@ -405,7 +434,7 @@ public class StockManagement {
         // Find and remove the stock item
         boolean itemFound = false;
         for (int i = 0; i < stockList.size(); i++) {
-            if (stockList.get(i).getId().equals(id)) {  // Changed from getItemID() to getId()
+            if (stockList.get(i).getId().equals(id)) {
                 stockList.remove(i);
                 itemFound = true;
                 break;
@@ -413,13 +442,17 @@ public class StockManagement {
         }
     
         if (itemFound) {
+            // Define the path where you want to save the updated inventory file (e.g., user's home directory)
+            String filePath = "inventory.txt";
+    
             // Save updated list to file
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter("stock.txt"))) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+                // Write each stock item from the updated list back to the file
                 for (Stock stock : stockList) {
-                    writer.write(stock.toFileFormat());  // Save the stock items back to the file
+                    writer.write(stock.toFileFormat());
                     writer.newLine();
                 }
-                System.out.println("Stock item with ID " + id + " deleted successfully and file updated.");
+                System.out.println("Stock item with ID " + id + " deleted successfully and file updated at: " + filePath);
             } catch (IOException e) {
                 System.out.println("An error occurred while updating the file: " + e.getMessage());
             }
@@ -427,9 +460,10 @@ public class StockManagement {
             System.out.println("Stock item with ID " + id + " not found.");
         }
     
+        // Pause execution for 2 seconds to allow the user to see the result
         sleepUtil.sleep(2000);
     }
-     
+       
     public static String generateNewItemID() {
         int highestNumber = 0;
         
@@ -453,90 +487,73 @@ public class StockManagement {
         return String.format("A%03d", newNumber); // Format the number with leading zeros (e.g., A001, A002)
     }
 
-    public static class Stock {
-        private String id;            // Item ID
-        private String name;          // Item name
-        private String desc;          // Description
-        private double price;         // Price per unit
-        private String unit;          // Unit (e.g., Litre, KG)
-        private String supplier;      // Supplier name
-        private int quantity;         // Quantity in stock
-        private String expiryDate;    // Expiry date of the item
+    public static void saveStockToFile(Stock newStock) {
+        // Define the writable path (e.g., a folder named 'output' in the project root)
+        String filePath = "inventory.txt";
     
-        // Default constructor
-        public Stock() {
-            this.id = "";
-            this.name = "";
-            this.desc = "";
-            this.price = 0.0;
-            this.unit = "";
-            this.supplier = "";
-            this.quantity = 0;
-            this.expiryDate = "";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
+            writer.write(newStock.toFileFormat());
+            writer.newLine();
+            System.out.println("Stock added successfully and saved to file: " + filePath);
+        } catch (IOException e) {
+            System.out.println("An error occurred while saving the stock: " + e.getMessage());
         }
+    }    
+    
+    public static void updateStockToFile() {
+        // Define the path where you want to save the updated inventory file (e.g., user's home directory)
+        String filePath = "inventory.txt";
+    
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            // Iterate over the stockList and write each stock item to the file
+            for (Stock stock : stockList) {
+                writer.write(stock.toFileFormat());
+                writer.newLine();
+            }
+            System.out.println("Stock updated successfully and saved to file: " + filePath);
+        } catch (IOException e) {
+            System.out.println("An error occurred while saving the stock: " + e.getMessage());
+        }
+    }
+    
+    public static class Stock extends InventoryManagement.Item{
+       private static int maxQuantity = 100;
     
         // Parameterized constructor
         public Stock(String id, String name, String desc, double price, String unit, String supplier, int quantity, String expiryDate) {
-            this.id = id;
-            this.name = name;
-            this.desc = desc;
-            this.price = price;
-            this.unit = unit;
-            this.supplier = supplier;
-            this.quantity = quantity;
-            this.expiryDate = expiryDate;
+            super(id, name, desc, price, unit, supplier, quantity, expiryDate);
         }
     
         // Getters and Setters
-        public String getId() { return id; }
-        public void setId(String id) { this.id = id; }
-    
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
-    
-        public String getDesc() { return desc; }
-        public void setDesc(String desc) { this.desc = desc; }
-    
-        public double getPrice() { return price; }
-        public void setPrice(double price) { this.price = price; }
-    
-        public String getUnit() { return unit; }
-        public void setUnit(String unit) { this.unit = unit; }
-    
-        public String getSupplier() { return supplier; }
-        public void setSupplier(String supplier) { this.supplier = supplier; }
-    
-        public int getQuantity() { return quantity; }
-        public void setQuantity(int quantity) { this.quantity = quantity; }
-    
-        public String getExpiryDate() { return expiryDate; }
-        public void setExpiryDate(String expiryDate) { this.expiryDate = expiryDate; }
+        public int getmaxQuantity(){ return maxQuantity;}
+        public void getmaxQuantity(int maxQuantity){ this.maxQuantity = maxQuantity; }
+
     
         // Methods
         public boolean lowStock() {
             // Consider low stock as less than 10% of a fixed max quantity, which could be configurable if needed
-            int maxQuantity = 100; // Default maximum quantity
-            return this.quantity < 0.1 * maxQuantity;
+            return getQty() < 0.1 * getmaxQuantity();
         }
     
         // Method to convert Stock object to a file format string
         public String toFileFormat() {
-            return id + "," + name + "," + desc + "," + price + "," + unit + "," + supplier + "," + quantity + "," + expiryDate;
+            return getId() + "," + getName() + "," + getDesc() + "," + getPrice() + "," + getUnit() + "," +
+                    getSupplier() + "," + getQty() + "," + getExpiryDate();
         }
     
         @Override
         public String toString() {
-            return 
-                "Stock{ " +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", desc='" + desc + '\'' +
-                ", price=" + price +
-                ", unit='" + unit + '\'' +
-                ", supplier='" + supplier + '\'' +
-                ", quantity=" + quantity +
-                ", expiryDate='" + expiryDate + '\'' +
-                '}';
+            return "Stock{ " +
+                    "id='" + getId() + '\'' +
+                    ", name='" + getName() + '\'' +
+                    ", desc='" + getDesc() + '\'' +
+                    ", price=" + getPrice() +
+                    ", unit='" + getUnit() + '\'' +
+                    ", supplier='" + getSupplier() + '\'' +
+                    ", quantity=" + getQty() +
+                    ", expiryDate='" + getExpiryDate() + '\'' +
+                    ", maxQuantity=" + getmaxQuantity() +
+                    '}';
         }
     } 
 
