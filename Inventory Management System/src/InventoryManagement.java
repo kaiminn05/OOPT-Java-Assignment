@@ -15,9 +15,9 @@ public class InventoryManagement {
     private static List<Item> items = new ArrayList<>();
 
     public static void showInvMenu() {
-
+        
         while (true) {
-            loadItemsData();
+            loadItemsData(); // load everytime
             ClearScreenUtil.clearScreen();
             System.out.println("Inventory Management");
             System.out.println("======================");
@@ -63,7 +63,6 @@ public class InventoryManagement {
                     break;
                 case 7:
                     checkExpiryAlerts();
-                    sleepUtil.sleep(2000);
                     break;
                 case 8:
                     return;
@@ -75,13 +74,15 @@ public class InventoryManagement {
         }
     }
 
+    // add item method
     private static void addItem() {
         ClearScreenUtil.clearScreen();
         System.out.println("ADD NEW INVENTORY ITEMS");
         System.out.println("=========================");
         System.out.print("Enter item name: ");
-        String name = scan.nextLine();
-        while (name.length() > 20 || name.isEmpty()) {
+        String name = scan.nextLine(); // let user enter item name
+        // validation for item name
+        while (name.length() > 20 || name.isEmpty()) { // check whether is empty or more than 20 char
             if (name.isEmpty()) {
                 System.out.println(ColorUtil.RED_BOLD + "The name field cannot be empty." + ColorUtil.RESET);
                 sleepUtil.sleep(1500);
@@ -96,8 +97,10 @@ public class InventoryManagement {
             System.out.print("Enter item name: ");
             name = scan.nextLine();
         }
+        // let user enter item description
         System.out.print("Enter item description: ");
         String desc = scan.nextLine();
+        // validation for description
         while (desc.length() > 20 || desc.isEmpty()) {
             if (desc.isEmpty()) {
                 desc = "N/A";
@@ -110,9 +113,10 @@ public class InventoryManagement {
                 desc = scan.nextLine();
             }
         }
-
+        // let user enter price
         double price;
         System.out.print("Enter item price: ");
+        // validation for price
         while (true) {
             if (scan.hasNextDouble()) {
                 price = scan.nextDouble();
@@ -137,8 +141,10 @@ public class InventoryManagement {
         }
 
         scan.nextLine();
+        // let user enter item unit
         System.out.print("Enter item unit: ");
         String unit = scan.nextLine();
+        // validtion for item unit
         while (unit.length() > 10 || unit.isEmpty()) {
             if (unit.isEmpty()) {
                 System.out.println(ColorUtil.RED_BOLD + "Item unit field cannot be empty." + ColorUtil.RESET);
@@ -154,12 +160,12 @@ public class InventoryManagement {
             System.out.print("Enter item unit: ");
             unit = scan.nextLine();
         }
-
+        // call the supplier method
         String supplier = chooseOrAddSupplier();
 
         String id = "A" + String.format("%03d", items.size() + 1);// generate unique ID for each items
         int quantity = 0;
-        String expiryDate = "N/A";
+        String expiryDate = "N/A"; // set the expiry date to N/A by default
         Item newItem = new Item(id, name, desc, price, unit, supplier, quantity, expiryDate);
         items.add(newItem);
         boolean success = saveItemData(newItem);
@@ -213,7 +219,7 @@ public class InventoryManagement {
 
         Item itemToUpdate = null;
         for (Item item : items) {
-            if (item.getId().equalsIgnoreCase("A" + itemId)) {
+            if (item.getId().equalsIgnoreCase("A" + itemId)) { // ignore case
                 itemToUpdate = item;
                 break;
             }
@@ -232,7 +238,7 @@ public class InventoryManagement {
         System.out.println("5. Update Supplier");
         System.out.println("6. Update Quantity");
         System.out.print("Enter field number to update > ");
-        int updateChoice = scan.nextInt();
+        int updateChoice = scan.nextInt(); // let user choose what to update
         scan.nextLine();
 
         while (updateChoice < 1 || updateChoice > 6) {
@@ -248,13 +254,14 @@ public class InventoryManagement {
             case 1:
                 System.out.print("Enter new name: ");
                 String newname = scan.nextLine();
-                while(newname.length() > 20 || newname.isEmpty() || newname.equals(itemToUpdate.getName())){
-                    if(newname.isEmpty()){
+                // validation for new name and make sure its not same as the previous name
+                while (newname.length() > 20 || newname.isEmpty() || newname.equals(itemToUpdate.getName())) {
+                    if (newname.isEmpty()) {
                         System.out.println(ColorUtil.RED_BOLD + "Name cannot be empty." + ColorUtil.RESET);
-                    }else if(newname.equals(itemToUpdate.getName())){
+                    } else if (newname.equals(itemToUpdate.getName())) {
                         System.out.println(ColorUtil.RED_BOLD + "Same name cannot be updated." + ColorUtil.RESET);
-                    }else{
-                        System.out.println(ColorUtil.RED_BOLD + "Maximum character for name is 20." +  ColorUtil.RESET);
+                    } else {
+                        System.out.println(ColorUtil.RED_BOLD + "Maximum character for name is 20." + ColorUtil.RESET);
                     }
                     sleepUtil.sleep(2000);
                     ClearScreenUtil.clearPreviousLine();
@@ -267,6 +274,7 @@ public class InventoryManagement {
             case 2:
                 System.out.print("Enter new description: ");
                 String desc = scan.nextLine();
+                // validation for new description also make sure not same as previous
                 while (desc.length() > 20 || desc.isEmpty()) {
                     if (desc.isEmpty()) {
                         System.out.println(ColorUtil.RED_BOLD + "New description cannot be empty." + ColorUtil.RESET);
@@ -289,6 +297,8 @@ public class InventoryManagement {
             case 3:
                 double price;
                 System.out.print("Enter new price: ");
+                // validation for price and make sure its not same as previous price and always
+                // be +
                 while (true) {
                     if (scan.hasNextDouble()) {
                         price = scan.nextDouble();
@@ -303,7 +313,8 @@ public class InventoryManagement {
                         }
                     } else {
                         System.out
-                                .println(ColorUtil.RED_BOLD + "Invalid input. Please enter a valid number." + ColorUtil.RESET);
+                                .println(ColorUtil.RED_BOLD + "Invalid input. Please enter a valid number."
+                                        + ColorUtil.RESET);
                         sleepUtil.sleep(1500);
                         ClearScreenUtil.clearPreviousLine();
                         ClearScreenUtil.clearPreviousLine();
@@ -314,18 +325,68 @@ public class InventoryManagement {
                 scan.nextLine();
                 break;
             case 4:
-                System.out.print("Enter new unit: ");
-                itemToUpdate.setUnit(scan.nextLine());
+                while (true) {
+                    System.out.print("Enter new unit: ");
+                    String unit = scan.nextLine();
+                    if (unit.matches("[a-zA-Z\\s]+")) { 
+                        itemToUpdate.setUnit(unit);
+                        break; 
+                    } else {
+                        System.out.println(ColorUtil.RED_BOLD
+                                + "Invalid unit. Please enter a valid unit (letters only)." + ColorUtil.RESET);
+                        sleepUtil.sleep(1500);
+                        ClearScreenUtil.clearPreviousLine();
+                        ClearScreenUtil.clearPreviousLine();
+                    }
+                }
                 break;
+
             case 5:
-                System.out.print("Enter new supplier: ");
-                itemToUpdate.setSupplier(scan.nextLine());
+                while (true) {
+                    System.out.print("Enter new supplier: ");
+                    String supplier = scan.nextLine();
+                    if (supplier.matches("[a-zA-Z\\s]+")) { // ensure only spaces and letter
+                        itemToUpdate.setSupplier(supplier);
+                        break; 
+                    } else {
+                        System.out.println(ColorUtil.RED_BOLD
+                                + "Invalid supplier name. Please enter a valid supplier (letters only)."
+                                + ColorUtil.RESET);
+                        sleepUtil.sleep(1500);
+                        ClearScreenUtil.clearPreviousLine();
+                        ClearScreenUtil.clearPreviousLine();
+                    }
+                }
                 break;
+
             case 6:
-                System.out.print("Enter new quantity: ");
-                itemToUpdate.setQty(scan.nextInt());
-                scan.nextLine();
+                int quantity;
+                while (true) {
+                    System.out.print("Enter new quantity: ");
+                    if (scan.hasNextInt()) {
+                        quantity = scan.nextInt();
+                        scan.nextLine(); //consume new line
+                        if (quantity > 0) {
+                            itemToUpdate.setQty(quantity);
+                            break; 
+                        } else {
+                            System.out.println(
+                                    ColorUtil.RED_BOLD + "Quantity must be a positive integer." + ColorUtil.RESET);
+                            sleepUtil.sleep(1500);
+                            ClearScreenUtil.clearPreviousLine();
+                            ClearScreenUtil.clearPreviousLine();
+                        }
+                    } else {
+                        System.out.println(
+                                ColorUtil.RED_BOLD + "Invalid input. Please enter a valid integer." + ColorUtil.RESET);
+                        scan.next(); 
+                        sleepUtil.sleep(1500);
+                        ClearScreenUtil.clearPreviousLine();
+                        ClearScreenUtil.clearPreviousLine();
+                    }
+                }
                 break;
+
             default:
                 System.out.println("Invalid option.");
                 return;
@@ -335,7 +396,7 @@ public class InventoryManagement {
         saveUpdatedData(); // save all data after update
         System.out.println(ColorUtil.GREEN_BOLD + "Item updated successfully." + ColorUtil.RESET);
     }
-
+    //delete item method
     private static void deleteInventoryItem() {
         ClearScreenUtil.clearScreen();
         System.out.println("DELETE INVENTORY ITEMS");
@@ -409,16 +470,16 @@ public class InventoryManagement {
 
     private static String chooseOrAddSupplier() {
         List<String> suppliers = loadSuppliersFromFile();
-    
+
         System.out.println("1. Choose from previous suppliers");
         System.out.println("2. Add a new supplier");
-    
+
         int option;
         while (true) {
             System.out.print("Enter your choice (1 or 2): ");
             if (scan.hasNextInt()) {
                 option = scan.nextInt();
-                scan.nextLine();  
+                scan.nextLine();
                 if (option == 1 || option == 2) {
                     break;
                 } else {
@@ -426,11 +487,11 @@ public class InventoryManagement {
                 }
             } else {
                 System.out.println("Invalid input. Please enter a valid number (1 or 2).");
-                scan.next();  
+                scan.next();
             }
         }
-    
-        if (option == 1) {  // choose from previous suppliers
+
+        if (option == 1) { // choose from previous suppliers
             if (suppliers.isEmpty()) {
                 System.out.println("No existing suppliers found.");
             } else {
@@ -439,13 +500,13 @@ public class InventoryManagement {
                     System.out.println((i + 1) + ". " + suppliers.get(i));
                 }
             }
-    
+
             int choice;
             while (true) {
                 System.out.print("Enter your choice: ");
                 if (scan.hasNextInt()) {
                     choice = scan.nextInt();
-                    scan.nextLine();  
+                    scan.nextLine();
                     if (choice > 0 && choice <= suppliers.size()) {
                         return suppliers.get(choice - 1);
                     } else {
@@ -453,19 +514,19 @@ public class InventoryManagement {
                     }
                 } else {
                     System.out.println("Invalid input. Please enter a valid number.");
-                    scan.next();  
+                    scan.next();
                 }
             }
-        } else if (option == 2) {  // option for add new supplier
+        } else if (option == 2) { // option for add new supplier
             System.out.print("Enter new supplier name: ");
             String newSupplier = scan.nextLine();
             appendSupplierToFile(newSupplier);
             return newSupplier;
         }
-    
-        return null;  
+
+        return null;
     }
-    
+
     private static void setExpiryDate() {
         ClearScreenUtil.clearScreen();
         System.out.println("SET EXPIRY DATE");
@@ -607,7 +668,7 @@ public class InventoryManagement {
 
             return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
         } catch (ParseException e) {
-            
+
             return -1;
         }
     }
@@ -659,7 +720,7 @@ public class InventoryManagement {
                     String line = fileScanner.nextLine();
                     String[] details = line.split(",");
                     if (details.length > 0) {
-                        suppliers.add(details[0]);  // first col for supplier name
+                        suppliers.add(details[0]); // first col for supplier name
                     }
                 }
             } catch (FileNotFoundException e) {
@@ -671,7 +732,7 @@ public class InventoryManagement {
 
     private static void appendSupplierToFile(String supplier) {
         try (FileWriter writer = new FileWriter("Inventory Management System/resources/supplier.txt", true)) {
-            writer.write(supplier + ",N/A,N/A,0,0\n"); 
+            writer.write(supplier + ",N/A,N/A,0,0\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -737,7 +798,7 @@ public class InventoryManagement {
             this.quantity = quantity;
             this.expiryDate = expiryDate;
         }
-
+        //getter setter
         public String getId() {
             return id;
         }

@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -13,7 +14,7 @@ public class InventorySystem {
     public static void main(String[] args) {
         showLoginMenu();
     }
-
+    //display login menu
     public static void showLoginMenu() {
         SupplierManagement.loadSupplier();// load the supplier
         InventoryManagement.loadItemsData();
@@ -40,11 +41,11 @@ public class InventorySystem {
                 System.out.println("Invalid choice. Please try again.");
         }
     }
-
+    //display main menu
     public static void showMainMenu() {
         while (true) {
             ClearScreenUtil.clearScreen();
-            showLoading();
+            showLoading(); //show loading screen
             sleepUtil.sleep(2000);
             ClearScreenUtil.clearScreen();
             // show the notification
@@ -59,11 +60,11 @@ public class InventorySystem {
             System.out.println("2. Stock In & Restock");
             System.out.println("3. Supplier Management");
             System.out.println("4. Logout");
-            System.out.print("Enter your choice > ");
+            System.out.print("Enter your choice > "); //let user enter choice
             int choice = scan.nextInt();
             scan.nextLine();
 
-            switch (choice) {
+            switch (choice) { //seperate which module can access by role like "admin,inventory manager,stock clerk and supplier manager"
                 case 1:
                     if (loggedInUser.getRole().equals("Admin") || loggedInUser.getRole().equals("Inventory Manager")) {
                         System.out.println("Accessing Inventory Management...");
@@ -112,8 +113,8 @@ public class InventorySystem {
             }
         }
     }
-
-    private static void login() {
+    //login part
+    private static void login() { 
         List<User> users = retrieveUserData();
         while (true) {
             ClearScreenUtil.clearScreen();
@@ -129,7 +130,7 @@ public class InventorySystem {
                 }
             }
             if (currentUser == null) {
-                System.out.println("Username not found. Please try again.");
+                System.out.println(ColorUtil.RED_BOLD + "Username not found. Please try again." + ColorUtil.RESET);
                 sleepUtil.sleep(1500);
                 ClearScreenUtil.clearScreen();
                 continue;
@@ -151,7 +152,7 @@ public class InventorySystem {
             }
         }
     }
-
+    //register part
     private static void register() {
         List<User> users = retrieveUserData();
         while (true) {
@@ -161,10 +162,11 @@ public class InventorySystem {
             System.out.print("Enter username: ");
             String username = scan.nextLine();
             boolean usernameExists = false;
+            //check whether the username is exist
             for (User user : users) {
                 if (user.getUsername().equals(username)) {
                     System.out.println(
-                            "Username \"" + ColorUtil.CYAN_BOLD + username + ColorUtil.RESET + "\" already exists.");
+                            "Username \"" + ColorUtil.CYAN_BOLD + username + ColorUtil.RESET + "\" already exists."); //print error message if exist
                     sleepUtil.sleep(2000);
                     ClearScreenUtil.clearScreen();
                     usernameExists = true;
@@ -175,8 +177,10 @@ public class InventorySystem {
             if (usernameExists) {
                 continue;
             }
+            //let user enter password
             String password;
             System.out.print("Enter password (6-10 characters): ");
+            //validation for password
             while (true) {
                 if (scan.hasNextLine()) {
                     password = scan.nextLine();
@@ -199,9 +203,10 @@ public class InventorySystem {
                     }
                 }
             }
-
+            //let user enter age
             int age;
             System.out.print("Enter your age: ");
+            //validation for age
             while (true) {
                 if (scan.hasNextInt()) {
                     age = scan.nextInt();
@@ -226,7 +231,7 @@ public class InventorySystem {
                 }
                 scan.nextLine();
             }
-
+            //let user to choose role
             System.out.println("Choose your role: ");
             System.out.println("1. Admin");
             System.out.println("2. Inventory Manager");
@@ -270,7 +275,7 @@ public class InventorySystem {
             }
         }
     }
-
+    //method for retrieving user data
     private static List<User> retrieveUserData() {
         List<User> users = new ArrayList<>();
         try {
@@ -297,7 +302,7 @@ public class InventorySystem {
         }
         return users;
     }
-
+    //method for saving user data
     private static boolean saveUserData(List<User> users) {
         try (FileWriter writer = new FileWriter("Inventory Management System/resources/user.txt")) {
             for (User user : users) {
@@ -311,7 +316,7 @@ public class InventorySystem {
             return false;
         }
     }
-
+    //method for showing loading screen
     private static void showLoading() {
         ClearScreenUtil.clearScreen();
         System.out.print(ColorUtil.YELLOW_BOLD + "Loading Data" + ColorUtil.RESET);
@@ -335,7 +340,7 @@ public class InventorySystem {
             this.role = role;
         }
 
-        // get
+        // getter & setter
         public String getUsername() {
             return username;
         }
