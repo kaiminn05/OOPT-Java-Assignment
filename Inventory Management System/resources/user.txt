@@ -1,2 +1,3 @@
 kaiminn05,kaiminn230305,19,Admin
 lwq,123456,20,Supplier Manager
+kaiminn2303,abc12345,21,Supplier Manager

@@ -14,9 +14,6 @@ public class StockManagement {
     private static Scanner scan = new Scanner(System.in);
     private static List<Stock> stockList = new ArrayList<>();
     
-    public static void main(String[] args) {
-        showStockMenu();
-    }
 
     public static void showStockMenu() {
         while (true) {
@@ -55,9 +52,7 @@ public class StockManagement {
                     deleteStock();
                     break;
                 case 6:
-                    System.out.println("Exiting the program. Goodbye!");
-                    System.exit(0);
-                    break;
+                    InventorySystem.showMainMenu();
                 default:
                     System.out.println("Invalid Choice. Please Try Again");
                     sleepUtil.sleep(2000);
@@ -70,7 +65,7 @@ public class StockManagement {
     stockList.clear(); // Clear the existing list
 
     // First, try to load the file from the root folder
-    File rootFile = new File("inventory.txt");
+    File rootFile = new File("Inventory Management System/resources/inventory.txt");
     if (rootFile.exists()) {
         try (BufferedReader reader = new BufferedReader(new FileReader(rootFile))) {
             String line;
@@ -99,7 +94,7 @@ public class StockManagement {
     }
 
     // If not found in root, try to load from the resources folder
-    InputStream fileStream = InventoryManagement.class.getClassLoader().getResourceAsStream("inventory.txt");
+    InputStream fileStream = InventoryManagement.class.getClassLoader().getResourceAsStream("Inventory Management System/resources/inventory.txt");
     
     if (fileStream == null) {
         System.out.println("File not found in resources.");
@@ -186,117 +181,62 @@ public class StockManagement {
     }
     
     public static void addStock() {
-        System.out.println("Add New Stock");
-        System.out.println("==============");
+        loadStockFromFile(); // Load the stock items from the file
+        
+        if (stockList.isEmpty()) {
+            System.out.println("No items found in inventory to update.");
+            return;
+        }
     
-        String id = generateNewItemID();
-        System.out.println("Generated Item ID: " + id);
+        // Display all the stock items for the user to choose from
+        displayStockItems();
+        
+        System.out.print("Enter the Item ID of the stock you want to add more quantity to: ");
+        String id = scan.nextLine();
+        
+        Stock stockToUpdate = null;
     
-        // Input for Item Name
-        String name = "";
-        while (true) {
-            System.out.print("Enter Item Name: ");
-            name = scan.nextLine();
-            if (name.matches("[a-zA-Z\\s]+")) {
+        // Find the stock item by ID
+        for (Stock stock : stockList) {
+            if (stock.getId().equals(id)) {
+                stockToUpdate = stock;
                 break;
-            } else {
-                System.out.println("Invalid item name. Please enter alphabetic characters only.");
             }
         }
     
-        // Input for Item Description
-        String desc = "";
-        while (true) {
-            System.out.print("Enter Item Description: ");
-            desc = scan.nextLine();
-            if (!desc.isEmpty()) {
-                break;
-            } else {
-                System.out.println("Description cannot be empty.");
-            }
-        }
-    
-        // Input for Price
-        double price = 0.0;
-        while (true) {
-            System.out.print("Enter Price: ");
-            String input = scan.next();
-            try {
-                price = Double.parseDouble(input);
-                if (price < 0) {
-                    throw new Exception("Price less than 0");
+        if (stockToUpdate != null) {
+            System.out.println("Selected Item: " + stockToUpdate.getName());
+            
+            // Input for the quantity to add
+            int quantityToAdd = 0;
+            while (true) {
+                System.out.print("Enter the quantity to add: ");
+                String input = scan.next();
+                try {
+                    quantityToAdd = Integer.parseInt(input);
+                    if (quantityToAdd <= 0) {
+                        throw new Exception("Quantity should be more than 0");
+                    }
+                    break;
+                } catch (Exception ex) {
+                    System.out.println("Invalid quantity. Please enter a valid quantity.");
                 }
-                break;
-            } catch (Exception ex) {
-                System.out.println("Invalid price. Please enter a valid price.");
             }
+            scan.nextLine(); // Consume newline
+            
+            // Update the stock quantity
+            stockToUpdate.setQty(stockToUpdate.getQty() + quantityToAdd);
+            System.out.println("Stock quantity updated successfully.");
+            
+            // Save the updated stock to the file
+            updateStockToFile();
+        } else {
+            System.out.println("Stock item with ID " + id + " not found.");
         }
-        scan.nextLine(); // Consume newline
-    
-        // Input for Unit
-        String unit = "";
-        while (true) {
-            System.out.print("Enter Unit (e.g., Litre, KG): ");
-            unit = scan.nextLine();
-            if (!unit.isEmpty()) {
-                break;
-            } else {
-                System.out.println("Unit cannot be empty.");
-            }
-        }
-    
-        // Input for Supplier
-        String supplier = "";
-        while (true) {
-            System.out.print("Enter Supplier: ");
-            supplier = scan.nextLine();
-            if (!supplier.isEmpty()) {
-                break;
-            } else {
-                System.out.println("Supplier cannot be empty.");
-            }
-        }
-    
-        // Input for Quantity
-        int quantity = 0;
-        while (true) {
-            System.out.print("Enter Quantity: ");
-            String input = scan.next();
-            try {
-                quantity = Integer.parseInt(input);
-                if (quantity < 0) {
-                    throw new Exception("Quantity less than 0");
-                }
-                break;
-            } catch (Exception ex) {
-                System.out.println("Invalid quantity. Please enter a valid quantity.");
-            }
-        }
-        scan.nextLine(); // Consume newline
-    
-        // Input for Expiry Date
-        String expiryDate = "";
-        while (true) {
-            System.out.print("Enter Expiry Date (DD/MM/YYYY): ");
-            expiryDate = scan.nextLine();
-            if (expiryDate.matches("\\d{2}/\\d{2}/\\d{4}")) {
-                break;
-            } else {
-                System.out.println("Invalid date format. Please enter in the format DD/MM/YYYY.");
-            }
-        }
-    
-        // Create a new Stock object
-        Stock newStock = new Stock(id, name, desc, price, unit, supplier, quantity, expiryDate);
-    
-        // Add new stock to the list
-        stockList.add(newStock);
-    
-        // Save to file
-        saveStockToFile(newStock);
-    
-        sleepUtil.sleep(2000);
+        
+        sleepUtil.sleep(2000); // Pause execution for 2 seconds
     }
+    
     
     public static void updateStock() {
         displayStockItems();
@@ -442,7 +382,7 @@ public class StockManagement {
     
         if (itemFound) {
             // Define the path where you want to save the updated inventory file (e.g., user's home directory)
-            String filePath = "inventory.txt";
+            String filePath = "Inventory Management System/resources/inventory.txt";
     
             // Save updated list to file
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
@@ -488,7 +428,7 @@ public class StockManagement {
 
     public static void saveStockToFile(Stock newStock) {
         // Define the writable path (e.g., a folder named 'output' in the project root)
-        String filePath = "inventory.txt";
+        String filePath = "Inventory Management System/resources/inventory.txt";
     
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
             writer.write(newStock.toFileFormat());
@@ -501,7 +441,7 @@ public class StockManagement {
     
     public static void updateStockToFile() {
         // Define the path where you want to save the updated inventory file (e.g., user's home directory)
-        String filePath = "inventory.txt";
+        String filePath = "Inventory Management System/resources/inventory.txt";
     
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             // Iterate over the stockList and write each stock item to the file

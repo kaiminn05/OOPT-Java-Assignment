@@ -1,9 +1,0 @@
-A002,Tomato,Vegetable,5.0,KG,Grocer SDN BHD,0,23/05/2025
-A003,Carrot,hmm,20.0,KG,Vege SDN BHD,0,30/9/2024
-A004,Chicken Breast,N/A,25.0,KG,FROZEN SDN BHD,0,26/09/2024
-A005,Potato,N/A,25.0,KG,FreshMart SDB BHD,0,N/A
-A006,Chicken Chop,Black pepper,15.9,G,Dairy Product,0,N/A
-A007,Lamp Chop,Mint Flavour,19.9,G,Chop SDN BHD,0,N/A
-A008,Salmon Slice,150g,12.3,G,FROZEN SDN BHD,0,N/A
-A009,Mushroom,150g,3.5,G,Mushroom SDB BHD,0,N/A
-A010,Pumpkin,400g,17.16,G,FarmGreen SDN BHD,0,N/A

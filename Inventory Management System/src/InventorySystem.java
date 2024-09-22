@@ -15,7 +15,7 @@ public class InventorySystem {
     }
 
     public static void showLoginMenu() {
-        SupplierManagement.loadSupplier();//load the supplier 
+        SupplierManagement.loadSupplier();// load the supplier
         InventoryManagement.loadItemsData();
         ClearScreenUtil.clearScreen();
         System.out.println("Welcome to F&B Inventory Management System");
@@ -45,21 +45,20 @@ public class InventorySystem {
         while (true) {
             ClearScreenUtil.clearScreen();
             showLoading();
-            sleepUtil.sleep(2000); 
+            sleepUtil.sleep(2000);
             ClearScreenUtil.clearScreen();
-            //show the notification
+            // show the notification
             InventoryManagement.showExpiryNotifications();
 
             System.out.println("Press Enter to continue to the main menu...");
-            scan.nextLine(); 
+            scan.nextLine();
 
             ClearScreenUtil.clearScreen();
             System.out.println("\nF&B Inventory Management System");
             System.out.println("1. Inventory Management");
             System.out.println("2. Stock In & Restock");
             System.out.println("3. Supplier Management");
-            System.out.println("4. Check Expiry and Stock Alerts");
-            System.out.println("5. Logout");
+            System.out.println("4. Logout");
             System.out.print("Enter your choice > ");
             int choice = scan.nextInt();
             scan.nextLine();
@@ -94,7 +93,6 @@ public class InventorySystem {
                         System.out.println("Accessing Supplier Management...");
                         sleepUtil.sleep(2000);
                         SupplierManagement.showSupMenu();
-                        
 
                     } else {
                         System.out.println(ColorUtil.RED_BOLD
@@ -104,10 +102,6 @@ public class InventorySystem {
                     }
                     break;
                 case 4:
-                    System.out.println("Checking Expiry and Stock Alerts...");
-                    sleepUtil.sleep(2000);
-                    break;
-                case 5:
                     loggedInUser = null;
                     System.out.println(ColorUtil.GREEN_BOLD + "Logged out successfully." + ColorUtil.RESET);
                     sleepUtil.sleep(2000);
@@ -181,17 +175,58 @@ public class InventorySystem {
             if (usernameExists) {
                 continue;
             }
-
-            System.out.print("Enter password(at least 6 characters): ");
-            String password = scan.nextLine();
-            if (password.length() < 6) {
-                System.out.println("Password must be at least 6 character.");
-                sleepUtil.sleep(2000);
-                continue;
+            String password;
+            System.out.print("Enter password (6-10 characters): ");
+            while (true) {
+                if (scan.hasNextLine()) {
+                    password = scan.nextLine();
+                    if (password.length() < 6) {
+                        System.out.println(
+                                ColorUtil.RED_BOLD + "Password must be at least 6 characters." + ColorUtil.RESET);
+                        sleepUtil.sleep(2000);
+                        ClearScreenUtil.clearPreviousLine();
+                        ClearScreenUtil.clearPreviousLine();
+                        System.out.print("Enter password (6-10 characters): ");
+                    } else if (password.length() > 10) {
+                        System.out.println(
+                                ColorUtil.RED_BOLD + "Password must be no more than 10 characters." + ColorUtil.RESET);
+                        sleepUtil.sleep(2000);
+                        ClearScreenUtil.clearPreviousLine();
+                        ClearScreenUtil.clearPreviousLine();
+                        System.out.print("Enter password (6-10 characters): ");
+                    } else {
+                        break; // Password is valid, break the loop
+                    }
+                }
             }
-            System.out.print("Enter you age: ");
-            int age = scan.nextInt();
-            scan.nextLine();
+
+            int age;
+            System.out.print("Enter your age: ");
+            while (true) {
+                if (scan.hasNextInt()) {
+                    age = scan.nextInt();
+                    if (age >= 18 && age <= 100) {
+                        break;
+                    } else {
+                        System.out.println(
+                                ColorUtil.RED_BOLD + "Age Invalid. Age must be between 18 - 100" + ColorUtil.RESET);
+                        sleepUtil.sleep(2000);
+                        ClearScreenUtil.clearPreviousLine();
+                        ClearScreenUtil.clearPreviousLine();
+                        System.out.print("Enter your age: ");
+                    }
+                } else {
+                    System.out.println(
+                            ColorUtil.RED_BOLD + "Invalid input. Please enter a valid number." + ColorUtil.RESET);
+                    scan.next();
+                    sleepUtil.sleep(2000);
+                    ClearScreenUtil.clearPreviousLine();
+                    ClearScreenUtil.clearPreviousLine();
+                    System.out.print("Enter your age: ");
+                }
+                scan.nextLine();
+            }
+
             System.out.println("Choose your role: ");
             System.out.println("1. Admin");
             System.out.println("2. Inventory Manager");
@@ -278,13 +313,14 @@ public class InventorySystem {
     }
 
     private static void showLoading() {
-        ClearScreenUtil.clearScreen();  
+        ClearScreenUtil.clearScreen();
         System.out.print(ColorUtil.YELLOW_BOLD + "Loading Data" + ColorUtil.RESET);
-        for (int i = 0; i < 5; i++) {  //print the dot
-            System.out.print(ColorUtil.YELLOW_BOLD+ "." + ColorUtil.RESET); 
-            sleepUtil.sleep(1000);  
+        for (int i = 0; i < 5; i++) { // print the dot
+            System.out.print(ColorUtil.YELLOW_BOLD + "." + ColorUtil.RESET);
+            sleepUtil.sleep(1000);
         }
     }
+
     private static class User {
         private String username;
         private String password;
