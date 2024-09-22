@@ -129,7 +129,6 @@ public class StockManagement {
     }
 }
 
-
     public static void displayStockItems() {
         loadStockFromFile();
         System.out.println("Stock Items:");
