@@ -1,18 +1,32 @@
-## Getting Started
+# F&B Inventory Management System
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+## Project Structure
 
-## Folder Structure
+- **resources folder**:
+  - `inventory.txt`: Stores inventory items.
+  - `supplier.txt`: Stores supplier information.
+  - `user.txt`: Stores user details.
 
-The workspace contains two folders by default, where:
+- **src folder**:
+  - `ClearScreenUtil.java`: Utility class for clearing console screen.
+  - `ColorUtil.java`: Utility class for colored console text.
+  - `InventoryManagement.java`: Handles the overall inventory system.
+  - `InventorySystem.java`: Main class for managing the inventory system and menu interactions.
+  - `sleepUtil.java`: Utility class to pause execution.
+  - `StockManagement.java`: Manages stock operations (view, add, update, delete stock).
+  - `SupplierManagement.java`: Manages supplier operations (add, update, track performance).
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
+## Modules Overview
 
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
+### 1. Inventory Management Module
+- Allows navigation through stock and supplier management functionalities.
+- Menu includes options for inventory, stock in, supplier management, and logout.
 
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
+### 2. Stock In & Restock Module
+- Provides options to view stock levels, add new stock, update, and delete items.
+- Menu includes options for stock viewing, low stock alerts, adding, updating, and deleting stock.
 
-## Dependency Management
+### 3. Supplier Management Module
+- Manages supplier information, tracks performance, and handles supplier-related actions.
+- Menu includes adding, updating, tracking, and displaying supplier performance.
 
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
