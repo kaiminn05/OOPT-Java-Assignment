@@ -262,29 +262,41 @@ public class SupplierManagement {
         List<Supplier> supplierList = new ArrayList<>();
     
         // Read suppliers from the file
-        try (Scanner fileScanner = new Scanner(new File("Inventory Management System/resources/supplier.txt"))) {
-            while (fileScanner.hasNextLine()) {
-                String line = fileScanner.nextLine();
-                String[] details = line.split(",");
-    
-                if (details.length == 5) {  // Ensure the line contains all expected fields
-                    String name = details[0];
-                    String contact = details[1];
-                    String address = details[2];
-                    int rating = Integer.parseInt(details[3]);
-                    int deliveries = Integer.parseInt(details[4]);
-    
-                    // Create a new Supplier object and add it to the list
-                    Supplier supplier = new Supplier(name, contact, address);
-                    supplier.setRating(rating);
-                    supplier.setDeliveries(deliveries);
-                    supplierList.add(supplier);
-                }
+        try {
+            File supplierFile = new File("supplier.txt"); // Try to read from the root directory
+            if (!supplierFile.exists()) {
+                // If the file doesn't exist in the root directory, check the resources folder
+                supplierFile = new File("Inventory Management System/resources/supplier.txt");
             }
-        } catch (FileNotFoundException e) {
-            System.out.println(ColorUtil.RED_BOLD + "Supplier file not found." + ColorUtil.RESET);
+        
+            // Now try to read from the determined file
+            try (Scanner fileScanner = new Scanner(supplierFile)) {
+                while (fileScanner.hasNextLine()) {
+                    String line = fileScanner.nextLine();
+                    String[] details = line.split(",");
+        
+                    if (details.length == 5) {  // Ensure the line contains all expected fields
+                        String name = details[0];
+                        String contact = details[1];
+                        String address = details[2];
+                        int rating = Integer.parseInt(details[3]);
+                        int deliveries = Integer.parseInt(details[4]);
+        
+                        // Create a new Supplier object and add it to the list
+                        Supplier supplier = new Supplier(name, contact, address);
+                        supplier.setRating(rating);
+                        supplier.setDeliveries(deliveries);
+                        supplierList.add(supplier);
+                    }
+                }
+            } catch (FileNotFoundException e) {
+                System.out.println(ColorUtil.RED_BOLD + "Supplier file not found." + ColorUtil.RESET);
+                e.printStackTrace();
+                return;
+            }
+        } catch (Exception e) {
+            System.out.println(ColorUtil.RED_BOLD + "Error accessing supplier file." + ColorUtil.RESET);
             e.printStackTrace();
-            return;
         }
     
         // Display all suppliers
