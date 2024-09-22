@@ -10,6 +10,10 @@ public class SupplierManagement {
     private static Scanner scan = new Scanner(System.in);
     private static List<Supplier> suppliers = new ArrayList<>();
 
+    public static void main(String[] args) {
+        showSupMenu();
+    }
+
     public static void showSupMenu() {
         while (true) {
             ClearScreenUtil.clearScreen();
@@ -45,6 +49,7 @@ public class SupplierManagement {
                     sleepUtil.sleep(2000);
                     break;
                 case 5:
+                    ClearScreenUtil.clearScreen();
                     displayAllSupplierAndPerformancel();
                     System.out.print("Press any key to continue...");
                     scan.nextLine();
@@ -284,10 +289,14 @@ public class SupplierManagement {
     
         // Display all suppliers
         System.out.println("All Suppliers and Performance:");
-        System.out.println("=============================");
+        System.out.println("===============================================================================================================");
+        System.out.printf("%-30s %-15s %-30s %-10s %-15s%n", "Name", "Contact", "Address", "Rating", "Deliveries");
+        System.out.println("-------------------------------------------------------------------------------------------------------");
         for (Supplier supplier : supplierList) {
-            System.out.println(supplier); // Supplier's toString method will format the output
+            System.out.println(supplier);
         }
+        System.out.println("===============================================================================================================");
+
     }
     
 
@@ -442,9 +451,13 @@ public class SupplierManagement {
 
         @Override
         public String toString() {
-            return "Supplier [Name=" + name + ", Contact=" + contact + ", Address=" + address +
-                    ", Rating=" + rating + ", Deliveries=" + deliveries + "]";
-        }
-    }
+            return String.format("%-30s %-15s %-30s %-10s %-15s",
+                    "Name: " + name,
+                    "Contact: " + contact,
+                    "Address: " + address,
+                    "Rating: " + rating,
+                    "Deliveries: " + deliveries)
+                    ;}
 
+    }
 }
